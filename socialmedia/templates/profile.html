@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
+    <title>Profile Page</title>
+</head>
+<body>
+    <h1>Profile</h1>
+    <details>
+        <summary>Menu</summary>
+        <ul>
+            <li><a href="{{url_for('showposts')}}">Home</a></li>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Account</a></li>
+            <li><a href="#">Logout</a></li>
+        </ul>
+    </details>
+
+    <img src="{{ url_for('static', filename='images/' + user.imgpath) }}"
+     alt="Profile picture"
+     width="75">
+         <h3>{{user.name}}</h3>
+         <h4>Description</h4>
+         <input type="text" name="desc" value = "{{user.description}}">
+         <button onclick="descupdate()">Save</button>
+         <details>
+        <summary>⚙ Settings</summary>
+        <ul>
+            <li><a href="{{ url_for('editnamepage') }}">Edit Name</a></li>
+            <li><a href="{{ url_for('uploadimg') }}">Edit Profile Image</a></li>
+        </ul>
+    </details>
+        <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+
+    
+</body>
+</html>
