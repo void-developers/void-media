@@ -1,0 +1,158 @@
+from flask import Flask, request, jsonify, session, send_from_directory
+from flask_cors import CORS
+import sqlite3
+from werkzeug.security import generate_password_hash, check_password_hash
+import os
+
+# --- Setup Flask ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(__name__, static_folder=BASE_DIR, static_url_path="")
+CORS(app)
+app.secret_key = "your-secret-key"  # change this to something secure
+
+# --- Database ---
+def init_db():
+    conn = sqlite3.connect(os.path.join(BASE_DIR, "social_media.db"))
+    c = conn.cursor()
+
+    # users table
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            fullname TEXT NOT NULL
+        )
+    """)
+
+    # posts table
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS posts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+def get_db():
+    conn = sqlite3.connect(os.path.join(BASE_DIR, "social_media.db"))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# initialize DB
+init_db()
+
+# --- Static routes (Frontend) ---
+@app.route("/")
+def index():
+    return send_from_directory(BASE_DIR, "index.html")
+
+@app.route("/<path:path>")
+def static_files(path):
+    return send_from_directory(BASE_DIR, path)
+
+# --- API routes ---
+@app.route("/api/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    if not all(k in data for k in ["username", "password", "fullname"]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    hashed_password = generate_password_hash(data["password"])
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO users (username, password, fullname) VALUES (?, ?, ?)",
+            (data["username"], hashed_password, data["fullname"])
+        )
+        conn.commit()
+        return jsonify({"message": "User registered successfully"}), 201
+    except sqlite3.IntegrityError:
+        return jsonify({"error": "Username already exists"}), 409
+    finally:
+        conn.close()
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    if not all(k in data for k in ["username", "password"]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    user = c.execute("SELECT * FROM users WHERE username = ?", (data["username"],)).fetchone()
+    conn.close()
+
+    if user and check_password_hash(user["password"], data["password"]):
+        session["user_id"] = user["id"]
+        return jsonify({
+            "message": "Login successful",
+            "user": {
+                "id": user["id"],
+                "username": user["username"],
+                "fullname": user["fullname"]
+            }
+        })
+
+    return jsonify({"error": "Invalid credentials"}), 401
+
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    session.pop("user_id", None)
+    return jsonify({"message": "Logged out successfully"})
+
+@app.route("/api/posts", methods=["POST"])
+def create_post():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json()
+    if "content" not in data:
+        return jsonify({"error": "Missing content"}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("INSERT INTO posts (user_id, content) VALUES (?, ?)", (session["user_id"], data["content"]))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Post created successfully"}), 201
+
+@app.route("/api/posts", methods=["GET"])
+def get_posts():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    conn = get_db()
+    c = conn.cursor()
+    posts = c.execute("""
+        SELECT posts.*, users.username, users.fullname
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+        ORDER BY posts.created_at DESC
+    """).fetchall()
+    conn.close()
+
+    return jsonify({
+        "posts": [{
+            "id": post["id"],
+            "content": post["content"],
+            "created_at": post["created_at"],
+            "author": {
+                "id": post["user_id"],
+                "username": post["username"],
+                "fullname": post["fullname"]
+            }
+        } for post in posts]
+    })
+
+# --- Run ---
+if __name__ == "__main__":
+    app.run(debug=True)
