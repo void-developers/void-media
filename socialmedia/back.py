@@ -18,7 +18,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 load_dotenv()
 uri = os.getenv("MONGO_URI")
 client = MongoClient(uri)
-db = client['test']
+db = client['Void_media']
 
 def allowed_file(filename):
      return "." in filename and filename.rsplit(".",1)[1].lower() in ALLOWED_EXTENSIONS
