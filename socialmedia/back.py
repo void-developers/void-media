@@ -35,6 +35,7 @@ def signup():
 
 @app.route("/add", methods=["POST"])
 def add_user():
+     try:
         data = request.get_json()
         if not data:
              return jsonify({"error": "no JSON data"}), 400
@@ -45,6 +46,9 @@ def add_user():
         hashed_password = generate_password_hash(addpassword)
         db.users.insert_one({"name": addname, "password": hashed_password, "imgpath": defaultimg, "description": defaultdesc})       
         return jsonify ({"message": "saved successfully"})
+      except Exception as e:
+        print("ERROR:", e)  # 👈 This is key
+        return jsonify({"error": "server error"}), 500
     
 @app.route("/login", methods = ["POST"])
 def login():
