@@ -3,7 +3,6 @@ document.getElementById("signupbtn")?.addEventListener("click", async () => {
     const addname = document.getElementById("addname").value.trim();
     const addpassword = document.getElementById("addpassword").value.trim();
 
-    try {
         const res = await fetch("/add", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -17,11 +16,6 @@ document.getElementById("signupbtn")?.addEventListener("click", async () => {
         } else {
             alert("Error. Try again later");
         }
-
-    } catch (err) {
-        console.error(err);
-        alert("Error connecting to server");
-    }
 });
 
 
