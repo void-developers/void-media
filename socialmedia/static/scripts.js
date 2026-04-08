@@ -1,18 +1,26 @@
-// ---------- SIGNUP ----------
+//------signup
 document.getElementById("signupbtn")?.addEventListener("click", async () => {
     const addname = document.getElementById("addname").value.trim();
     const addpassword = document.getElementById("addpassword").value.trim();
 
-    const res = await fetch("/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ addname, addpassword })
-    });
-    if (data.message === "saved successfully"){
-        alert("saved successfully");
-    }
-    else{
-        alert("Error.Try again later");
+    try {
+        const res = await fetch("/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ addname, addpassword })
+        });
+
+        const data = await res.json(); // ✅ IMPORTANT
+
+        if (data.message === "saved successfully") {
+            alert("saved successfully");
+        } else {
+            alert("Error. Try again later");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Error connecting to server");
     }
 });
 
