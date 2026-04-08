@@ -14,45 +14,56 @@ document.getElementById("signupbtn")?.addEventListener("click", async () => {
 });
 
 // ---------- LOGIN ----------
-document.getElementById("loginbtn")?.addEventListener("click", async () => {
+document.getElementById("loginbtn")?.addEventListener("click", async (event) => {
+    event.preventDefault(); // prevent default form submit
+
     const name = document.getElementById("name").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    const res = await fetch("/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, password })
-    });
+    if (!name || !password) return alert("Enter both fields");
 
-    const data = await res.json();
+    try {
+        const res = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, password })
+        });
 
-    if (data.message === "login successfull") {
-        window.location.href = "/showposts";
-    } else {
-        alert("Invalid login");
+        const data = await res.json();
+
+        if (data.message === "login successfull") {
+            window.location.href = "/showposts";
+        } else {
+            alert(data.message || data.error || "Invalid login");
+        }
+    } catch (err) {
+        alert("Error connecting to server");
+        console.error(err);
     }
 });
 
 
 console.log("Sign-Log script loaded successfully!");
 
-// ---------- POSTS ----------
+//---------- CREATE POST ----------
+
 document.getElementById("postBtn")?.addEventListener("click", async () => {
     const content = document.getElementById("post").value;
     if (!content) return alert("Write something!");
 
-    const res = await fetch("/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content })
-    });
+    try {
+        const res = await fetch("/posts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content })
+        });
 
-    const data = await res.json();
-    if (data.message) location.reload();
-});
-document.getElementById("post").addEventListener("keypress", (event) => {
-    if (event.key === "Enter") {
-        document.getElementById("postBtn").click();
+        const data = await res.json();
+        if (data.error) return alert(data.error);
+        if (data.message) location.reload();
+    } catch (err) {
+        console.error(err);
+        alert("Error posting. See console.");
     }
 });
 
@@ -114,5 +125,49 @@ document.getElementById("who")?.addEventListener("input", async (event) => {
     }
 });
 
+// ---------- EDIT NAME ----------
+document.getElementById("saveNameBtn")?.addEventListener("click", async () => {
+    const newname = document.getElementById("newname").value.trim();
 
-console.log("Posts and Friend Request script loaded successfully!");
+    if (!newname) {
+        return alert("Enter a name!");
+    }
+
+    const res = await fetch("/editname", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ newname })
+    });
+
+    const data = await res.json();
+
+    alert(data.message || data.error);
+
+    if (data.message) {
+        window.location.href = "/profile"; // go back after success
+    }
+});
+
+//---------- EDIT DESCRIPTION ----------
+document.getElementById("saveDescBtn")?.addEventListener("click", async () => {
+    const desc = document.getElementById("desc").value.trim();
+    if (!desc) return alert("Description cannot be empty!");
+
+    const res = await fetch("/descupdate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ desc })
+    });
+
+    const data = await res.json();
+
+    if (data.message) {
+        alert(data.message);
+    } else {
+        alert(data.error || "Failed to update description.");
+    }
+});
+
+
