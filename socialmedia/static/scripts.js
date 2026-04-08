@@ -29,12 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // Check raw response first
             const resText = await res.text();
             let data;
-            try {
                 data = JSON.parse(resText); // Parse JSON manually
-            } catch (err) {
-                console.error("Failed to parse JSON:", err, "Raw response:", resText);
-                return alert("Signup failed: Invalid server response");
-            }
+
 
             console.log("Signup response:", data);
             if (data.message) {
