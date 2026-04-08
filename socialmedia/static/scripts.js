@@ -1,51 +1,21 @@
-// ---sign up----
-document.addEventListener("DOMContentLoaded", () => {
-    const signupBtn = document.getElementById("signupbtn");
-    const addNameInput = document.getElementById("addname");
-    const addPasswordInput = document.getElementById("addpassword");
+// ---------- SIGNUP ----------
+document.getElementById("signupbtn")?.addEventListener("click", async () => {
+    const addname = document.getElementById("addname").value.trim();
+    const addpassword = document.getElementById("addpassword").value.trim();
 
-    if (!signupBtn || !addNameInput || !addPasswordInput) {
-        console.error("Signup elements not found. Check your HTML IDs.");
-        return;
-    }
-
-    console.log("Signup script loaded successfully");
-
-    signupBtn.addEventListener("click", async () => {
-        const addname = addNameInput.value.trim();
-        const addpassword = addPasswordInput.value.trim();
-
-        if (!addname || !addpassword) {
-            return alert("Please enter both name and password");
-        }
-
-        try {
-            const res = await fetch("/add", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ addname, addpassword })
-            });
-
-            // Check raw response first
-            const resText = await res.text();
-            let data;
-                data = JSON.parse(resText); // Parse JSON manually
-
-
-            console.log("Signup response:", data);
-            if (data.message) {
-                alert(data.message); // Show success
-                addNameInput.value = "";
-                addPasswordInput.value = "";
-            } else {
-                alert(data.error || "Signup failed");
-            }
-        } catch (err) {
-            console.error("Error sending signup request:", err);
-            alert("Error connecting to server. Try again later.");
-        }
+    const res = await fetch("/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ addname, addpassword })
     });
+    if (data.message === "saved successfully"){
+        alert("saved successfully");
+    }
+    else{
+        alert("Error.Try again later");
+    }
 });
+
 
 // ---------- LOGIN ----------
 document.getElementById("loginbtn")?.addEventListener("click", async (event) => {
