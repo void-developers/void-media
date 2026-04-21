@@ -21,7 +21,7 @@
             <form>
                 <h1>Create Account</h1>
                 <div class="social-icons">
-                    <a href="/login/google"><i class="fa-brands fa-brands fa-google"></i></a>
+                    <a href="{{ url_for('google_login') }}"><i class="fa-brands fa-brands fa-google"></i></a>
                     <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
                 </div>
                 <span>or use your email for registeration</span>
@@ -35,7 +35,7 @@
                 <h1>Log In</h1>
                 <div class="social-icons">
                     
-                    <a href="#" class="icon"><i class="fa-brands fa-google"></i></a>
+                    <a href="{{ url_for('google_login') }}" class="icon"><i class="fa-brands fa-google"></i></a>
                     <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
                     
                 </div>
