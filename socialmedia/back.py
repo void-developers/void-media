@@ -9,8 +9,8 @@ from google_auth_oauthlib.flow import Flow
 import requests
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
-import shutil
-import json
+import cloudinary
+import cloudinary.uploader
 
 from flask import Flask, request,jsonify, render_template, redirect, url_for, session
 from pymongo import MongoClient
@@ -29,9 +29,15 @@ uri = os.getenv("MONGO_URI")
 client = MongoClient(uri)
 db = client['Void_media']
 
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET")
+)
+
 GOOGLE_CLIENT_ID = "78105620575-9hmje8ja5vtn4bamf6gjkfqmljhbb0q2.apps.googleusercontent.com"
 client_config = json.loads(os.environ.get("GOOGLE_CLIENT_SECRET"))
-flow = Flow.from_client_config(client_config=client_config , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
+flow = Flow.from_client_secrets_file(client_secrets_file=client_secrets_file , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 def allowed_file(filename):
@@ -158,6 +164,7 @@ def editnamepage():
      }
      
      return render_template("editname.html", user=user_data)
+     
 
 @app.route("/editname", methods = ["POST"])
 def editname():
@@ -169,23 +176,48 @@ def editname():
      db.users.update_one({"_id": ObjectId(user_id)},{"$set":{"name":new_name}})
      return jsonify ({"message": "updated successfully"})
 
-@app.route("/uploadimg", methods = ["POST"])
+@app.route("/uploadimg", methods=["POST"])
 def uploadimg():
-     if "file" not in request.files:
-          return jsonify({"error": "no file found"})
-     file = request.files["file"]
-     if file.filename == "":
-          return jsonify({"error":"no uplaoded file"})
-     if file and allowed_file(file.filename):
-          filename = secure_filename(file.filename)
-          file.save(os.path.join(app.config["UPLOAD_FOLDER"],filename))
+        if "file" not in request.files:
+            return jsonify({"error": "no file found"}), 400
 
-          user_id = session.get("user_id")
-          if not user_id:
-               return jsonify({"message":"not logged in"})
-          db.users.update_one({"_id": ObjectId(user_id)},{"$set": {"imgpath": filename}})
-          return jsonify({"message":"image updated"})
-     return jsonify({"error":"file type not allowed"})
+        file = request.files["file"]
+
+        if file.filename == "":
+            return jsonify({"error": "no uploaded file"}), 400
+
+        if not allowed_file(file.filename):
+            return jsonify({"error": "file type not allowed"}), 400
+
+        user_id = session.get("user_id")
+        if not user_id:
+            return jsonify({"error": "not logged in"}), 401
+
+        user = db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return jsonify({"error": "user not found"}), 404
+
+        # delete old image
+        if user.get("public_id"):
+            cloudinary.uploader.destroy(user["public_id"])
+
+        # upload new image
+        result = cloudinary.uploader.upload(file)
+        db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {
+                "imgpath": result["secure_url"],
+                "public_id": result["public_id"]
+            }}
+        )
+        return jsonify({"message": "image updated"})
+
+@app.route("/editimgpage")
+def editimgpage():
+     user_id = session.get("user_id")
+     if not user_id:
+          return redirect(url_for("home"))
+     return render_template("editimage.html")
 
 @app.route("/posts", methods=["POST"])
 def posts():
@@ -224,11 +256,16 @@ def showposts():
           return redirect(url_for("home"))
      user = db.users.find_one({"_id": ObjectId(user_id)})
      username = user["name"]
+     profile_pic = user.get("imgpath")
      
      posts_curser = db.posts.find().sort("created_at", -1)
-     posts = list(posts_curser)
-     
-     return render_template("home.html", posts=posts , name=username)
+     posts = []
+
+     for post in posts_curser:
+       user = db.users.find_one({"_id": post.get("user_id")})
+       post["poster_img"] = user.get("imgpath") if user else None
+       posts.append(post)
+     return render_template("home.html", posts=posts , name=username, profile_pic=profile_pic)
 
 @app.route("/searchbar")
 def searchbar():
