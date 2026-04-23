@@ -21,24 +21,29 @@
       href="https://image.pngaaa.com/316/6201316-middle.png"
     />
 
+    
+    <link  rel="stylesheet" href="profile.css">
     <title>Profile Page</title>
   </head>
 
   <body>
-    <div class="profile-container">
-      <h1>Profile</h1>
+   <header class="header">
+  <div class="header-inner">
 
-      <div class="card">
-        <details>
-          <summary>Menu</summary>
-          <ul>
-            <li><a href="{{url_for('showposts')}}">Home</a></li>
-            <li><a href="#">Privacy</a></li>
-            <li><a href="#">Account</a></li>
-            <li><a href="#">Logout</a></li>
-          </ul>
-        </details>
-      </div>
+    <div class="logo">
+      <span class="logo-icon">✦</span>
+      <span class="logo-text">Void<span class="logo-accent">Media</span></span>
+    </div>
+
+    <nav class="nav">
+      <a href="#" class="nav-link">Home</a>
+      <a href="#" class="nav-link">Profile</a>
+      <a href="#" class="nav-link">Settings</a>
+      <a href="#" class="nav-link nav-logout">Logout</a>
+    </nav>
+
+  </div>
+</header>
 
       <div class="card">
         <div class="profile-top">
