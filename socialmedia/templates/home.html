@@ -85,11 +85,6 @@
     <div class="welcome-banner reveal">
         <!-- ADDED: profile pic next to welcome name -->
         <div class="welcome-left">
-            {% if profile_pic %}
-                <img src="{{ profile_pic }}" class="welcome-avatar" alt="Profile" />
-            {% else %}
-                <div class="welcome-avatar-initials">{{ name[0] | upper }}</div>
-            {% endif %}
             <div class="welcome-text">
                 <p class="welcome-sub">Good to see you back</p>
                 <h1 class="welcome-name">{{name}} <span class="wave">✦</span></h1>
@@ -103,7 +98,17 @@
 
     <div class="compose-card reveal" style="--delay:0.1s">
         <div class="compose-header">
-            <div class="compose-avatar">{{ name[0] | upper }}</div>
+            <div class="compose-avatar">
+                {% if profile_pic == "default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.webp" %}
+    <img src="{{ url_for('static', filename='images/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.webp') }}" alt="Profile" class="welcome-avatar" />
+
+{% elif profile_pic %}
+    <img src="{{ profile_pic }}" alt="Profile" class="welcome-avatar" />
+
+{% else %}
+    <div class="user-profile-initials">{{ name[0] | upper }}</div>
+{% endif %}
+            </div>
             <input type="text" id="post" placeholder="What's on your mind?" autocomplete="off" />
         </div>
         <div class="compose-footer">
@@ -127,7 +132,17 @@
         {% for post in posts %}
         <article class="post-card reveal" style="--delay:{{ 0.2 + loop.index0 * 0.07 }}s">
             <div class="post-top">
-                <div class="post-avatar">{{ post["name"][0] | upper }}</div>
+                <div class="post-avatar">
+                    {% if post.poster_img == "default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.webp" %}
+                        <img src="{{ url_for('static', filename='images/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.webp') }}" alt="Profile" />
+
+                    {% elif post.poster_img %}
+                        <img src="{{ post.poster_img }}" alt="Profile" />
+
+                    {% else %}
+                        <div class="user-profile-initials">{{ name[0] | upper }}</div>
+                    {% endif %}
+                </div>
                 <div class="post-meta">
                     <span class="post-author">{{ post["name"] }}</span>
                     <time class="post-time">{{ post["created_at"] }}</time>
