@@ -64,6 +64,17 @@
                 <a href="#" class="nav-link"><span class="nav-icon">○</span> Account</a>
                 <a href="{{url_for('home')}}" class="nav-link nav-logout">Logout →</a>
             </nav>
+
+            <!-- ADDED: profile pic + name in header, like Facebook -->
+            <div style="display:flex;align-items:center;gap:9px;margin-left:12px;">
+                {% if profile_pic %}
+                    <img src="{{ profile_pic }}" class="user-profile-pic" alt="Profile" />
+                {% else %}
+                    <div class="user-profile-initials">{{ name[0] | upper }}</div>
+                {% endif %}
+                <span style="font-size:14px;font-weight:600;color:var(--text);">{{ name }}</span>
+            </div>
+
         </div>
     </div>
 </header>
@@ -72,9 +83,17 @@
 <main class="main">
 
     <div class="welcome-banner reveal">
-        <div class="welcome-text">
-            <p class="welcome-sub">Good to see you back</p>
-            <h1 class="welcome-name">{{name}} <span class="wave">✦</span></h1>
+        <!-- ADDED: profile pic next to welcome name -->
+        <div class="welcome-left">
+            {% if profile_pic %}
+                <img src="{{ profile_pic }}" class="welcome-avatar" alt="Profile" />
+            {% else %}
+                <div class="welcome-avatar-initials">{{ name[0] | upper }}</div>
+            {% endif %}
+            <div class="welcome-text">
+                <p class="welcome-sub">Good to see you back</p>
+                <h1 class="welcome-name">{{name}} <span class="wave">✦</span></h1>
+            </div>
         </div>
         <div class="welcome-stat">
             <span class="stat-num counter" data-target="{{ posts|length }}">0</span>
