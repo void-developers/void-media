@@ -38,7 +38,7 @@ cloudinary.config(
 
 GOOGLE_CLIENT_ID = "78105620575-9hmje8ja5vtn4bamf6gjkfqmljhbb0q2.apps.googleusercontent.com"
 client_config = json.loads(os.environ.get("GOOGLE_CLIENT_SECRET"))
-flow = Flow.from_client_secrets_file(client_config=client_config , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
+flow = Flow.from_client_config(client_config=client_config , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 def allowed_file(filename):
