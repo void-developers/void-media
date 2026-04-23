@@ -48,7 +48,7 @@
       <div class="card">
         <div class="profile-top">
           <img
-            src="{{ url_for('static', filename='images/' + user.imgpath) }}"
+            src="{{user.imgpath}}"
             alt="Profile picture"
           />
           <h3 class="profile-name">{{user.name}}</h3>
@@ -64,7 +64,7 @@
           <summary>⚙ Settings</summary>
           <ul>
             <li><a href="{{ url_for('editnamepage') }}">Edit Name</a></li>
-            <li><a href="{{ url_for('uploadimg') }}">Edit Profile Image</a></li>
+            <li><a href="{{ url_for('editimgpage') }}">Edit Profile Image</a></li>
           </ul>
         </details>
       </div>
