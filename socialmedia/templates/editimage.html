@@ -7,8 +7,10 @@
     </head>
     <body>
         <h1>Edit Your profile picture</h1>
-        <input type="file" id="file"><br><br>
-        <button onclick=<!-- js function--><>Upload</button><br><br>
-        <a href="{{url_for('profileurl')}}">Back</a>
+        <form action="/uploadimg" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file"><br><br>
+    <button type="submit">Upload</button>
+</form>
+        <a href="{{url_for('profile')}}">Back</a>
     </body>
 </html>
