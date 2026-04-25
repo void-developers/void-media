@@ -36,10 +36,18 @@ cloudinary.config(
     api_secret=os.getenv("CLOUDINARY_API_SECRET")
 )
 
+#delete from here if you want to test locally
 GOOGLE_CLIENT_ID = "78105620575-9hmje8ja5vtn4bamf6gjkfqmljhbb0q2.apps.googleusercontent.com"
 client_config = json.loads(os.environ.get("GOOGLE_CLIENT_SECRET"))
 flow = Flow.from_client_config(client_config=client_config , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+# to here
+# and replace with this
+"""
+GOOGLE_CLIENT_ID = "78105620575-9hmje8ja5vtn4bamf6gjkfqmljhbb0q2.apps.googleusercontent.com"
+flow = Flow.from_client_secrets_file("client_secrets.json" , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+"""
 
 def allowed_file(filename):
      return "." in filename and filename.rsplit(".",1)[1].lower() in ALLOWED_EXTENSIONS
