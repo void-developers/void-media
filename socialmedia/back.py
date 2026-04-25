@@ -255,7 +255,7 @@ def showposts():
      user_id = session.get("user_id")
      if not user_id:
           return redirect(url_for("home"))
-     user = db.users.find_one({"_id": ObjectId(user_id)})
+     user = db.users.find_one({"_id": ObjectId(user_id)}).limit(10)
      username = user["name"]
      profile_pic = user.get("imgpath")
      
