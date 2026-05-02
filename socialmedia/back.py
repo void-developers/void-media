@@ -37,10 +37,15 @@ cloudinary.config(
 )
 
 #delete from here if you want to test locally
+
 GOOGLE_CLIENT_ID = "78105620575-9hmje8ja5vtn4bamf6gjkfqmljhbb0q2.apps.googleusercontent.com"
 client_config = json.loads(os.environ.get("GOOGLE_CLIENT_SECRET"))
 flow = Flow.from_client_config(client_config=client_config , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" 
+
+
+
+
 # to here
 # and replace with this
 """
@@ -48,6 +53,7 @@ GOOGLE_CLIENT_ID = "78105620575-9hmje8ja5vtn4bamf6gjkfqmljhbb0q2.apps.googleuser
 flow = Flow.from_client_secrets_file("client_secrets.json" , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 """
+
 
 def allowed_file(filename):
      return "." in filename and filename.rsplit(".",1)[1].lower() in ALLOWED_EXTENSIONS
@@ -402,4 +408,4 @@ def deletenotif(notification_id):
 
 if __name__== "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True)
