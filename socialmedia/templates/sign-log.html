@@ -24,6 +24,14 @@
   </head>
 
   <body>
+    <!-- Ambient floating orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Floating particles -->
+    <canvas id="particles"></canvas>
+
     <div class="container" id="container">
       <div class="form-container sign-up">
         <form>
@@ -34,7 +42,7 @@
             ></a>
             <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
           </div>
-          <input type="user name " placeholder="user Name" id="addname" />
+          <input type="user name " placeholder="user-name" id="addname" />
           <input type="password" placeholder="Password" id="addpassword" />
           <button id="signupbtn" type="button">Sign Up</button>
         </form>
@@ -48,7 +56,7 @@
             ></a>
             <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
           </div>
-          <input type="text" placeholder="user name" id="name" />
+          <input type="text" placeholder="user-name" id="name" />
           <input type="password" placeholder="Password" id="password" />
           <button id="loginbtn" type="button">Log In</button>
         </form>
@@ -71,5 +79,43 @@
     <div class="team-name">©Void-Develper</div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+    <script>
+      // ── Floating particles ───────────────────────────────
+      const canvas = document.getElementById("particles");
+      const ctx = canvas.getContext("2d");
+      let W,
+        H,
+        pts = [];
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      for (let i = 0; i < 70; i++)
+        pts.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          r: Math.random() * 1.4 + 0.2,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25,
+          a: Math.random() * 0.35 + 0.05,
+        });
+
+      (function draw() {
+        ctx.clearRect(0, 0, W, H);
+        pts.forEach((p) => {
+          p.x = (p.x + p.vx + W) % W;
+          p.y = (p.y + p.vy + H) % H;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(123,92,255,${p.a})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      })();
+    </script>
   </body>
 </html>
