@@ -51,6 +51,8 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
 
+
+
 # to here
 # and replace with this
 """
@@ -124,6 +126,9 @@ def add_user():
         addname = data.get("addname")
         addpassword = data.get("addpassword")
         hashed_password = generate_password_hash(addpassword)
+        users = db.users.find_one({"name": addname})
+        if users:
+             return jsonify({"error": "username already exists"}), 400
         db.users.insert_one({"name": addname, "password": hashed_password, "imgpath": defaultimg, "description": defaultdesc})       
         return jsonify ({"message": "saved successfully"})
      

@@ -17,7 +17,7 @@ document.getElementById("signupbtn")?.addEventListener("click", async () => {
     if (data.message === "saved successfully") {
       alert("saved successfully");
     } else {
-      alert("Error. Try again later");
+      alert("Username already taken");
     }
   } catch (err) {
     console.error(err);
@@ -38,9 +38,8 @@ document
     const addname = document.getElementById("addname").value.trim();
     const addpassword = document.getElementById("addpassword").value.trim();
 
-    if (!addname || !addpassword) return alert("Enter both fields");
-
     if (event.key === "Enter") {
+      if (!addname || !addpassword) return alert("Enter both fields");
       try {
         const res = await fetch("/add", {
           method: "POST",
@@ -53,7 +52,7 @@ document
         if (data.message === "saved successfully") {
           alert("saved successfully");
         } else {
-          alert("Error. Try again later");
+          alert("Username already taken");
         }
       } catch (err) {
         console.error(err);
