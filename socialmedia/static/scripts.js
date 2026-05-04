@@ -23,6 +23,40 @@ document.getElementById("signupbtn")?.addEventListener("click", async () => {
   }
 });
 
+document.getElementById("addname")?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    document.getElementById("addpassword").focus();
+  }
+});
+
+// press enter to sign up
+document
+  .getElementById("addpassword")
+  ?.addEventListener("keydown", async (event) => {
+    const addname = document.getElementById("addname").value.trim();
+    const addpassword = document.getElementById("addpassword").value.trim();
+    if (event.key === "Enter") {
+      try {
+        const res = await fetch("/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ addname, addpassword }),
+        });
+
+        const data = await res.json(); // ✅ IMPORTANT
+
+        if (data.message === "saved successfully") {
+          alert("saved successfully");
+        } else {
+          alert("Error. Try again later");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error connecting to server");
+      }
+    }
+  });
+
 // ---------- LOGIN ----------
 document
   .getElementById("loginbtn")
@@ -54,6 +88,44 @@ document
     }
   });
 
+document.getElementById("name")?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    document.getElementById("password").focus();
+  }
+});
+
+//press enter to log in
+document
+  .getElementById("password")
+  ?.addEventListener("keydown", async (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // prevent default form submit
+      const name = document.getElementById("name").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!name || !password) return alert("Enter both fields");
+
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, password }),
+        });
+
+        const data = await res.json();
+
+        if (data.message === "login successfull") {
+          window.location.href = "/showposts";
+        } else {
+          alert(data.message || data.error || "Invalid login");
+        }
+      } catch (err) {
+        alert("Error connecting to server");
+        console.error(err);
+      }
+    }
+  });
+
 console.log("Sign-Log script loaded successfully!");
 
 //---------- CREATE POST ----------
@@ -77,6 +149,30 @@ document.getElementById("postBtn")?.addEventListener("click", async () => {
     alert("Error posting. See console.");
   }
 });
+
+document
+  .querySelector(".postInput")
+  .addEventListener("keydown", async (event) => {
+    const content = document.querySelector(".postInput").value;
+
+    if (event.key === "Enter") {
+      if (!content) return alert("Write something!");
+      try {
+        const res = await fetch("/posts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content }),
+        });
+
+        const data = await res.json();
+        if (data.error) return alert(data.error);
+        if (data.message) location.reload();
+      } catch (err) {
+        console.error(err);
+        alert("Error posting. See console.");
+      }
+    }
+  });
 
 // ---------- FRIEND REQUEST ----------
 // Send Friend Request
@@ -187,3 +283,9 @@ document.getElementById("saveDescBtn")?.addEventListener("click", async () => {
     alert(data.error || "Failed to update description.");
   }
 });
+
+setInterval(async () => {
+  if (window.location.pathname === "/showposts") {
+    await location.reload();
+  }
+}, 4000);
