@@ -3,6 +3,8 @@ document.getElementById("signupbtn")?.addEventListener("click", async () => {
   const addname = document.getElementById("addname").value.trim();
   const addpassword = document.getElementById("addpassword").value.trim();
 
+  if (!addname || !addpassword) return alert("Enter both fields");
+
   try {
     const res = await fetch("/add", {
       method: "POST",
@@ -35,6 +37,9 @@ document
   ?.addEventListener("keydown", async (event) => {
     const addname = document.getElementById("addname").value.trim();
     const addpassword = document.getElementById("addpassword").value.trim();
+
+    if (!addname || !addpassword) return alert("Enter both fields");
+
     if (event.key === "Enter") {
       try {
         const res = await fetch("/add", {
