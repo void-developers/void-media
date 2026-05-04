@@ -30,16 +30,13 @@
    <header class="header">
   <div class="header-inner">
 
-    <div class="logo">
-      <span class="logo-icon">✦</span>
+    <div class="logo" onclick="window.location.href = '/showposts'">
+      <span class="logo-icon">𖣐</span>
       <span class="logo-text">Void<span class="logo-accent">Media</span></span>
     </div>
 
     <nav class="nav">
-      <a href="#" class="nav-link">Home</a>
-      <a href="#" class="nav-link">Profile</a>
-      <a href="#" class="nav-link">Settings</a>
-      <a href="#" class="nav-link nav-logout">Logout</a>
+      <a href="{{url_for('home')}}" class="nav-link nav-logout">Logout</a>
     </nav>
 
   </div>

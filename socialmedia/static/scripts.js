@@ -152,7 +152,7 @@ document.getElementById("postBtn")?.addEventListener("click", async () => {
 
 document
   .querySelector(".postInput")
-  .addEventListener("keydown", async (event) => {
+  ?.addEventListener("keydown", async (event) => {
     const content = document.querySelector(".postInput").value;
 
     if (event.key === "Enter") {
@@ -284,8 +284,29 @@ document.getElementById("saveDescBtn")?.addEventListener("click", async () => {
   }
 });
 
+document.getElementById("desc")?.addEventListener("keydown", async (event) => {
+  if (event.key === "Enter") {
+    const desc = document.getElementById("desc").value.trim();
+    if (!desc) return alert("Description cannot be empty!");
+
+    const res = await fetch("/descupdate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ desc }),
+    });
+
+    const data = await res.json();
+
+    if (data.message) {
+      alert(data.message);
+    } else {
+      alert(data.error || "Failed to update description.");
+    }
+  }
+});
+
 setInterval(async () => {
   if (window.location.pathname === "/showposts") {
     await location.reload();
   }
-}, 4000);
+}, 14000);
