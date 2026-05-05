@@ -18,6 +18,7 @@ from pymongo import MongoClient
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from flask import request, render_template
 
 
 app = Flask(__name__)
@@ -39,10 +40,14 @@ cloudinary.config(
 
 #delete from here if you want to test locally
 
+
+
 GOOGLE_CLIENT_ID = "78105620575-9hmje8ja5vtn4bamf6gjkfqmljhbb0q2.apps.googleusercontent.com"
 client_config = json.loads(os.environ.get("GOOGLE_CLIENT_SECRET"))
 flow = Flow.from_client_config(client_config=client_config , scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"], redirect_uri="https://void-media-lynj.onrender.com/callback")
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" 
+
+
 
 
 
@@ -66,10 +71,21 @@ def allowed_file(filename):
      return "." in filename and filename.rsplit(".",1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+
 @app.route("/")
 def home():
-     session.clear()
-     return render_template("sign-log.html")
+    user_agent = request.user_agent.string.lower()
+
+    if "mobile" in user_agent:
+        session.clear()
+        return render_template("sign-log-mobile.html")
+    else:
+        session.clear()
+        return render_template("sign-log.html")
+
+
+
+
 
 @app.route("/google-login")
 def google_login():
@@ -110,10 +126,6 @@ def callback():
         session["user_id"] = str(user["_id"])
 
      return redirect(url_for("showposts"))
-
-@app.route("/signup")
-def signup():
-    return render_template("signup.html")
 
 
 @app.route("/add", methods=["POST"])
@@ -283,7 +295,7 @@ def showposts():
      username = user["name"]
      profile_pic = user.get("imgpath")
      
-     posts_curser = db.posts.find().sort("created_at", -1).limit(10)
+     posts_curser = db.posts.find().sort("created_at", -1)
      posts = []
 
      for post in posts_curser:
