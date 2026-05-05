@@ -11,8 +11,10 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
     />
-    <!-- Flask: replace with {{ url_for('static', filename='sign-log.css') }} -->
-    <link rel="stylesheet" href="sign-log.css" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='sign-log-mobile.css') }}"
+    />
     <title>Void Media</title>
     <link
       rel="icon"
@@ -21,19 +23,16 @@
   </head>
 
   <body>
-   
     <!-- Floating particles -->
     <canvas id="particles"></canvas>
 
     <!-- Page Wrapper -->
     <div class="page-wrap">
-
       <!-- Logo -->
       <div class="logo">𖣐<span>Void</span>Media</div>
 
       <!-- Auth Card -->
       <div class="auth-card">
-
         <!-- Tabs -->
         <div class="tabs">
           <button class="tab-btn active" data-tab="login">Log In</button>
@@ -78,13 +77,20 @@
                   placeholder="••••••••"
                   autocomplete="current-password"
                 />
-                <button class="toggle-pw" data-target="password" type="button" aria-label="Toggle password">
+                <button
+                  class="toggle-pw"
+                  data-target="password"
+                  type="button"
+                  aria-label="Toggle password"
+                >
                   <i class="fa-regular fa-eye"></i>
                 </button>
               </div>
             </div>
 
-            <button class="btn-primary" id="loginbtn" type="button">Log In</button>
+            <button class="btn-primary" id="loginbtn" type="button">
+              Log In
+            </button>
           </div>
 
           <div class="card-footer">
@@ -131,13 +137,20 @@
                   placeholder="••••••••"
                   autocomplete="new-password"
                 />
-                <button class="toggle-pw" data-target="addpassword" type="button" aria-label="Toggle password">
+                <button
+                  class="toggle-pw"
+                  data-target="addpassword"
+                  type="button"
+                  aria-label="Toggle password"
+                >
                   <i class="fa-regular fa-eye"></i>
                 </button>
               </div>
             </div>
 
-            <button class="btn-primary" id="signupbtn" type="button">Create Account</button>
+            <button class="btn-primary" id="signupbtn" type="button">
+              Create Account
+            </button>
           </div>
 
           <div class="card-footer">
@@ -145,13 +158,13 @@
             <a class="switch-tab" data-tab="login">Log in</a>
           </div>
         </div>
-
-      </div><!-- /auth-card -->
+      </div>
+      <!-- /auth-card -->
 
       <div class="credit">©Void-Developer</div>
-    </div><!-- /page-wrap -->
+    </div>
+    <!-- /page-wrap -->
 
-    <!-- Flask: replace with {{ url_for('static', filename='sign-log.js') }} -->
-    <script src="sign-log.js"></script>
+    <script src="{{ url_for('static', filename='sign-log-mobile.js') }}"></script>
   </body>
 </html>
