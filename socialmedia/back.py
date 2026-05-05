@@ -297,7 +297,7 @@ def showposts():
      username = user["name"]
      profile_pic = user.get("imgpath")
      
-     posts_curser = db.posts.find().sort("created_at", -1)
+     posts_curser = db.posts.find().sort("created_at", -1).limit(10)
      posts = []
 
      for post in posts_curser:
