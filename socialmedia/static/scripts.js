@@ -16,6 +16,7 @@ document.getElementById("signupbtn")?.addEventListener("click", async () => {
 
     if (data.message === "saved successfully") {
       alert("saved successfully");
+      document.getElementById("login").click();
     } else {
       alert("Username already taken");
     }
