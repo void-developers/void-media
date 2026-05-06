@@ -15,8 +15,8 @@ document.getElementById("signupbtn")?.addEventListener("click", async () => {
     const data = await res.json(); // ✅ IMPORTANT
 
     if (data.message === "saved successfully") {
-      alert("saved successfully");
       document.getElementById("login").click();
+      alert("saved successfully");
     } else {
       alert("Username already taken");
     }
@@ -51,6 +51,7 @@ document
         const data = await res.json(); // ✅ IMPORTANT
 
         if (data.message === "saved successfully") {
+          document.getElementById("login").click();
           alert("saved successfully");
         } else {
           alert("Username already taken");
