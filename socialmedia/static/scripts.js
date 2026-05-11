@@ -148,7 +148,11 @@ document.getElementById("postBtn")?.addEventListener("click", async () => {
     });
 
     const data = await res.json();
+
     if (data.error) return alert(data.error);
+    savedText = "";
+    inputText.value = savedText;
+    localStorage.setItem("savedText", savedText);
     if (data.message) location.reload();
   } catch (err) {
     console.error(err);
@@ -172,6 +176,9 @@ document
 
         const data = await res.json();
         if (data.error) return alert(data.error);
+        savedText = "";
+        inputText.value = savedText;
+        localStorage.setItem("savedText", savedText);
         if (data.message) location.reload();
       } catch (err) {
         console.error(err);
@@ -315,4 +322,4 @@ setInterval(async () => {
   if (window.location.pathname === "/showposts") {
     await location.reload();
   }
-}, 14000);
+}, 18000);

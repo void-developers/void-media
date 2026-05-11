@@ -140,7 +140,7 @@
         <!-- ADDED: profile pic next to welcome name -->
         <div class="welcome-left">
           <div class="welcome-text">
-            <p class="welcome-sub">Welcome back Nigga</p>
+            <p class="welcome-sub">Welcome Back</p>
             <h1 class="welcome-name">{{name}} <span class="wave">𖣐</span></h1>
           </div>
         </div>
@@ -176,7 +176,7 @@
             id="post"
             placeholder="What's on your mind?"
             autocomplete="off"
-            class="postInput"
+            class="postInput savedText"
           />
         </div>
         <div class="compose-footer">
@@ -242,6 +242,19 @@
     </main>
 
     <form></form>
+
+    <script>
+      const inputText = document.querySelector(".savedText");
+      let savedText = localStorage.getItem("savedText") || "";
+      inputText.addEventListener("keyup", (e) => {
+        if (e) {
+          savedText = inputText.value;
+          localStorage.setItem("savedText", savedText);
+        }
+      });
+
+      inputText.value = savedText;
+    </script>
 
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     <script>

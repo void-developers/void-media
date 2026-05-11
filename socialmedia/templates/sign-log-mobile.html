@@ -18,7 +18,7 @@
     <title>Void Media</title>
     <link
       rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>𖣐</text></svg>"
+      href="{{ url_for('static', filename='images/none.png') }}"
     />
   </head>
 
@@ -29,7 +29,13 @@
     <!-- Page Wrapper -->
     <div class="page-wrap">
       <!-- Logo -->
-      <div class="logo">𖣐<span>Void</span>Media</div>
+      <div class="logo">
+        <img
+          class="logo-icon"
+          src="{{ url_for('static', filename='images/none.png') }}"
+          alt="Void Media logo"
+        /><span>Void</span>Media
+      </div>
 
       <!-- Auth Card -->
       <div class="auth-card">
@@ -47,11 +53,11 @@
 
             <div class="social-row">
               <!-- Flask: replace href with {{ url_for('google_login') }} -->
-              <a href="#" class="social-btn">
+              <a href="#" class="social-btn google">
                 <i class="fa-brands fa-google"></i>
                 <span>Google</span>
               </a>
-              <a href="#" class="social-btn">
+              <a href="#" class="social-btn github">
                 <i class="fa-brands fa-github"></i>
                 <span>GitHub</span>
               </a>
@@ -64,7 +70,7 @@
               <input
                 type="text"
                 id="name"
-                placeholder="username"
+                placeholder="your-username"
                 autocomplete="username"
               />
             </div>
@@ -107,11 +113,11 @@
 
             <div class="social-row">
               <!-- Flask: replace href with {{ url_for('google_login') }} -->
-              <a href="#" class="social-btn">
+              <a href="#" class="social-btn google">
                 <i class="fa-brands fa-google"></i>
                 <span>Google</span>
               </a>
-              <a href="#" class="social-btn">
+              <a href="#" class="social-btn github">
                 <i class="fa-brands fa-github"></i>
                 <span>GitHub</span>
               </a>
