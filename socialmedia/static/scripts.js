@@ -32,7 +32,7 @@ document.getElementById("addname")?.addEventListener("keydown", (event) => {
   }
 });
 
-// press enter to sign up
+// enter key for sign up
 document
   .getElementById("addpassword")
   ?.addEventListener("keydown", async (event) => {
@@ -100,7 +100,7 @@ document.getElementById("name")?.addEventListener("keydown", (event) => {
   }
 });
 
-//press enter to log in
+//enter key for login
 document
   .getElementById("password")
   ?.addEventListener("keydown", async (event) => {
@@ -160,6 +160,7 @@ document.getElementById("postBtn")?.addEventListener("click", async () => {
   }
 });
 
+//enter key for posting
 document
   .querySelector(".postInput")
   ?.addEventListener("keydown", async (event) => {
@@ -186,71 +187,6 @@ document
       }
     }
   });
-
-// ---------- FRIEND REQUEST ----------
-// Send Friend Request
-document
-  .getElementById("sendRequestBtn")
-  ?.addEventListener("click", async () => {
-    const friendId = document.getElementById("friendId").value.trim();
-    if (!friendId) return alert("Enter a valid friend ID!");
-
-    const res = await fetch("/send_friend_request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ friendId }),
-    });
-
-    const data = await res.json();
-    alert(data.message || data.error);
-  });
-
-// Accept Friend Request
-document
-  .getElementById("acceptRequestBtn")
-  ?.addEventListener("click", async () => {
-    const requestId = document.getElementById("requestId").value.trim();
-    if (!requestId) return alert("Enter a valid request ID!");
-
-    const res = await fetch("/accept_friend_request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ requestId }),
-    });
-
-    const data = await res.json();
-    alert(data.message || data.error);
-  });
-
-// ---------- SEARCH FRIEND ----------
-document.getElementById("who")?.addEventListener("input", async (event) => {
-  const query = event.target.value.trim();
-  const resultsContainer = document.getElementById("searchResults");
-
-  if (!query) {
-    resultsContainer.innerHTML = ""; // Clear results
-    return;
-  }
-
-  const res = await fetch(`/searchbar?who=${encodeURIComponent(query)}`);
-  const data = await res.json();
-
-  if (data && data.length > 0) {
-    resultsContainer.innerHTML = data
-      .map(
-        (user) => `
-            <div class="search-result">
-                <img src="static/images/${user.imgpath}" alt="Profile">
-                <p>${user.name}</p>
-                <button onclick="sendFriendRequest(${user.user_id})">Add Friend</button>
-            </div>
-        `,
-      )
-      .join("");
-  } else {
-    resultsContainer.innerHTML = "<p>No users found</p>";
-  }
-});
 
 // ---------- EDIT NAME ----------
 document.getElementById("saveNameBtn")?.addEventListener("click", async () => {
@@ -297,6 +233,7 @@ document.getElementById("saveDescBtn")?.addEventListener("click", async () => {
   }
 });
 
+// enter key for desc editing
 document.getElementById("desc")?.addEventListener("keydown", async (event) => {
   if (event.key === "Enter") {
     const desc = document.getElementById("desc").value.trim();
@@ -317,6 +254,8 @@ document.getElementById("desc")?.addEventListener("keydown", async (event) => {
     }
   }
 });
+
+// reloading the homepage for live messaging
 
 setInterval(async () => {
   if (window.location.pathname === "/showposts") {

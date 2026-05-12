@@ -48,19 +48,6 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # to here
 # and replace with this
 """
