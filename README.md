@@ -1,7 +1,7 @@
 Void-Media
 
 A modern social media and messaging platform built with Flask and MongoDB.
-Designed with a dark void-inspired aesthetic, real-time feed updates, and responsive layouts that adapt depending on the user’s device. Because apparently humans looked at ordinary social media apps and thought, “what if we made it darker, prettier, and slightly more alive?”
+Designed with a dark void-inspired aesthetic, real-time feed updates, and responsive layouts that adapt depending on the user’s device.
 
 Features:
 Authentication
