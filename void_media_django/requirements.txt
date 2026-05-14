@@ -1,10 +1,8 @@
 ﻿altgraph==0.17.4
 asgiref==3.11.1
-auto-py-to-exe==2.47.0
 bandit==1.9.4
 blinker==1.9.0
 bottle==0.13.4
-bottle-websocket==0.2.9
 certifi==2025.8.3
 cffi==2.0.0
 charset-normalizer==3.4.3
@@ -15,7 +13,6 @@ cryptography==46.0.7
 distlib==0.4.0
 Django==6.0.4
 dnspython==2.8.0
-Eel==0.18.2
 filelock==3.29.0
 Flask==3.0.3
 flask-cors==6.0.1
@@ -42,14 +39,10 @@ pyasn1==0.6.3
 pyasn1_modules==0.4.2
 pycparser==2.23
 Pygments==2.20.0
-pyinstaller==6.15.0
-pyinstaller-hooks-contrib==2025.8
 pymongo==4.16.0
 pyparsing==3.2.4
 python-discovery==1.2.2
 python-dotenv==1.2.2
-pywin32-ctypes==0.2.3
-python-3.11.9
 PyYAML==6.0.3
 requests==2.32.5
 requests-oauthlib==2.0.0
