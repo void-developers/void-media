@@ -1,0 +1,28 @@
+
+
+        {% for post in posts %}
+        <div id="post-{{post.id}}">
+            {% if post.edited %}
+            <small>Edited</small>
+            {% endif %}
+            <a href="{% url 'profile' post.username.id %}"><p>@{{ post.username }}</a> - {{post.created_at|timesince}} ago</p>
+            <p>{{ post.content|safe }}</p> <!-- |safe can receive attacks if someone wrote a code -->
+            <a href="{% url 'comment' post.id %}"><button>Comments({{post.comments.count}})</button></a>
+        </div>
+            <form method="POST" action="{% url 'like' post.id  %}">
+                {% csrf_token %}
+                {% if post.is_liked %}
+                <button type="submit">Unlike</button>
+                {% else %}
+                <button type="submit">Like</button>
+                {% endif %}
+            </form>
+
+                <a href="{% url 'liked_users' post.id %}?type=post"><p>{{ post.likes.count }} Likes</p></a>
+
+                {% if request.user == post.username %}
+                    <a href="{% url 'edit_post' post.id %}?next={{ request.path}}"><small>Update Post</small></a>
+                {% endif %}
+            <hr>
+        {% endfor %}
+

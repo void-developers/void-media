@@ -1,0 +1,17 @@
+{% for comment in comments %}
+    <a href="{% url 'profile' comment.username.id %}">@{{ comment.username }}</a> - {{comment.created_at|timesince}}
+    <p>{{ comment.content|safe }}</p> <!-- |safe can receive attacks if someone wrote a code -->
+
+    
+
+    <form method="POST" action="{% url 'comments_like'  comment.id  %}">
+        {% csrf_token %}
+        {% if comment.is_liked %}
+        <button type="submit">Unlike</button>
+        {% else %}
+        <button type="submit">Like</button>
+        {% endif %}
+    </form>
+    <a href="{% url 'liked_users' comment.id %}?type=comment"><p>{{ comment.likes.count }} Likes</p></a>
+    <hr>
+{% endfor %}
