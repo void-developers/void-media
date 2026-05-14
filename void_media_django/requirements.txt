@@ -58,3 +58,5 @@ virtualenv==21.3.0
 Werkzeug==3.0.3
 zope.event==6.0
 zope.interface==8.0
+zope.interface==8.0
+gunicorn==23.0.0
