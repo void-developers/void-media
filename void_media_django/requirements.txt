@@ -11,7 +11,7 @@ cloudinary==1.44.1
 colorama==0.4.6
 cryptography==46.0.7
 distlib==0.4.0
-Django==6.0.4
+Django==4.2.16
 dnspython==2.8.0
 filelock==3.29.0
 Flask==3.0.3
