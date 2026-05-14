@@ -80,10 +80,10 @@ WSGI_APPLICATION = 'void_media.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'void_media',
-        'USER': 'postgres',
-        'PASSWORD': 'montherziggs123456789',
-        'HOST': 'localhost',
+        'NAME': 'os.environ.get('DB_NAME')',
+        'USER': 'os.environ.get('DB_USER')',
+        'PASSWORD': 'os.environ.get('DB_PASSWORD')',
+        'HOST': 'os.environ.get('DB_HOST')',
         'PORT': '5432',
     }
 }
