@@ -1,0 +1,53 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<style>
+.feed-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 50px;
+}
+</style>
+
+<h1>{{ profile_user.username }}</h1>
+
+{% if request.user != profile_user %}
+    {% if is_friend %}
+        <button>Message</button>
+        <button>Unfriend</button>
+    {% elif incomming_request %}
+        <form method="POST" action="{% url 'accept_request' incomming_request.id %}">
+            {% csrf_token %}
+            <button type="submit">Accept Friend Request</button>
+        </form>
+    {% elif outgoing_request %}
+        <h3>Request Has Been Sended</h3>
+    {% else %}
+    <form  method="POST" action="{% url 'friend_request' profile_user.id %}">
+        {% csrf_token %}
+        <button type="submit">Friend request</button>
+    </form>
+    {% endif %}
+{% endif %}
+
+<hr>
+
+<div class="feed-container">
+    <div>
+        <h2>Posts</h2>
+        {% include 'base/posts_container.html' with posts=posts %}
+    </div>
+
+    <div>
+        <h2>Liked Posts</h2>
+        {% include 'base/posts_container.html' with posts=liked_posts %}
+    </div>
+
+    <div>
+        <h2>Liked Comments</h2>
+        {% include 'base/comments_container.html' %}
+    </div>
+</div>
+
+{% endblock %}

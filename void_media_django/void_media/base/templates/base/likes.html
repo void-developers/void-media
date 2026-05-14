@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Liked users</h1>
+{% for users in liked_users %}
+    <a href="{% url 'profile' user.id %}"><p>@{{ users }}</p></a>
+    <hr>
+{% endfor %}
+
+{% endblock %}
