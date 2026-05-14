@@ -392,7 +392,7 @@ def friends_list(request):
             receiver=request.user,
             is_read=False
         ).count()
-    return render(request, 'base/friends_list.html', {'friend': friend, 'f.unread_count':f.unread_count})
+    return render(request, 'base/friends_list.html', {'friend': friend})
 
 def chat(request, user_id):
     other_user = User.objects.get(id=user_id)
