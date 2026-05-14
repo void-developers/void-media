@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Void Media</title>
+</head>
+<body>
+    <a href="{% url 'home' %}"><h1>Void Media</h1></a>
+
+    <form method="GET" action="{% url 'search' %}">
+        {% csrf_token %}
+        <input type="text" name="q" placeholder="search a user here.....">
+        <button type="submit">Search</button>
+    </form>
+    
+    {% if user.is_authenticated %}
+        <a href="{% url 'profile' request.user.id %}"><p>{{ request.user.username }}!</p></a>
+        <a href="{% url 'logout' %}"><h1>Logout</h1></a>
+        <a href="{% url 'friends_list' %}"><h2>Friends</a>
+        {% if msg_count >  0 %}
+            {{msg_count}} new messages
+        {% endif %}
+        </h2>
+        {% if new_notification > 0 %}
+            <a href="{% url 'notifications' %}"><button>🔔({{new_notification}})</button></a>
+
+        {% else %}
+            <a href="{% url 'notifications' %}"><button>🔔</button></a>
+        {% endif %}
+
+    {% else %}
+
+    <a href="{% url 'login' %}"><h1>Login</h1></a>
+    <a href="{% url 'register' %}"><h1>Sign Up</h1></a>
+
+    {% endif %}
+    <hr>
+    {% block content %}
+
+
+    {% endblock %}
+    
+</body>
+</html>
