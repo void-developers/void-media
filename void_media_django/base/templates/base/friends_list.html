@@ -4,7 +4,7 @@
 
 {% for f in friend %}
     {% if f.user1 == request.user %}
-        <a href="{% url 'profile' f.user2.id %}"><b>{{f.user2.username}}</b></a>
+        <a href="{% url 'profile' f.user2.id %}"><b>@{{f.user2.username}}</b></a>
         <a href="{% url 'chat' f.user2.id %}"><button>Message</button></a>
             {% if f.unread_count > 0 %}
                 <small>{{f.unread_count}} new messages</small>
