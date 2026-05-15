@@ -41,9 +41,11 @@
                         {% csrf_token %}
                         <button type="submit">Ignore</button>
                     </form>
+                    <p>{{notification.created_at|timesince}} ago</p>
                 {% else %}
                     <p><a href="{% url 'profile' notification.sender.id %}">@{{notification.sender}}</a> sended a friend request!</p>
                     <h3>Accepted</h3>
+                    <p>{{notification.created_at|timesince}} ago</p>
                 {% endif %}
             {% endif %}
         {% endfor %}
