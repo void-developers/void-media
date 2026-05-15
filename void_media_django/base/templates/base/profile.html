@@ -14,15 +14,18 @@
 
 {% if request.user != profile_user %}
     {% if is_friend %}
-        <button>Message</button>
-        <button>Unfriend</button>
+        <a href="{% url 'chat' profile_user.id %}"><button>Message</button></a>
+        <form method="POST" action="{% url 'unfriend' profile_user.id %}">
+            {% csrf_token %}
+            <button type="submit">Unfriend</button>
+        </form>
     {% elif incomming_request %}
         <form method="POST" action="{% url 'accept_request' incomming_request.id %}">
             {% csrf_token %}
             <button type="submit">Accept Friend Request</button>
         </form>
     {% elif outgoing_request %}
-        <h3>Request Has Been Sended</h3>
+        <h3>Request Has Been Sent</h3>
     {% else %}
     <form  method="POST" action="{% url 'friend_request' profile_user.id %}">
         {% csrf_token %}

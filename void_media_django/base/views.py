@@ -371,6 +371,28 @@ def accept_request(request,pk):
         except:
             return HttpResponse('Something Went Wrong')
     return redirect(request.META.get('HTTP_REFERER'))
+
+def unfreind(request,user_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    profile_user = User.objects.get(id=user_id)
+    if request.user == profile_user:
+        return HttpResponse('unexpected error!!')
+    if request.method == 'POST':
+        try:
+            friends.objects.filter(
+                Q(user1 = profile_user, user2 = request.user) |
+                Q(user1 = request.user, user2 = profile_user)
+            ).delete()
+
+            friend_requests.objects.filter(
+                Q(sender = profile_user, receiver = request.user) |
+                Q(sender = request.user, receiver = profile_user)
+            ).delete()
+            return redirect('profile' ,pk = profile_user.id)
+        except:
+            return HttpResponse('unexpected error')
+
     
 
 def friends_list(request):

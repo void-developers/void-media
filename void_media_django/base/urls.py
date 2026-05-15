@@ -18,6 +18,7 @@ urlpatterns = [
     path('delete_notification/<int:pk>', views.delete_notification, name='delete_notification'),
     path('friend_request/<int:pk>', views.friend_request, name='friend_request'),
     path('accept_request/<int:pk>', views.accept_request, name='accept_request'),
+    path('unfriend/<int:user_id>', views.unfreind, name='unfriend'),
     path('friends_list', views.friends_list, name="friends_list"),
     path('chat/<int:user_id>', views.chat, name='chat'),
     ]
