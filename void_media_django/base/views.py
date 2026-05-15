@@ -395,6 +395,8 @@ def friends_list(request):
     return render(request, 'base/friends_list.html', {'friend': friend})
 
 def chat(request, user_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     other_user = User.objects.get(id=user_id)
     MassageModel.objects.filter(
                 sender = other_user,
