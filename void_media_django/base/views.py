@@ -504,6 +504,9 @@ def group_chat(request, group_id):
         return redirect('login')
     group = Groups.objects.get(id=group_id)
 
+    if request.user not in group.members.all():
+        return HttpResponse('You Are Not Allowed To Make This Action!!!!!')
+
     group_messages = Group_chat.objects.filter(
         group = group
     )
@@ -537,6 +540,9 @@ def group_chat(request, group_id):
 def group_info(request, group_id):
     group = Groups.objects.get(id=group_id)
 
+    if request.user not in group.members.all():
+        return HttpResponse('You Are Not Allowed To Make This Action!!!!!')
+
     group_members = group.members.all()
 
     return render(request, 'base/group_info.html', {'group_members':group_members, 'group':group})
@@ -547,6 +553,8 @@ def group_info(request, group_id):
 def add_member(request, group_id):
     group = Groups.objects.get(id=group_id)
 
+    if group.created_by != request.user:
+        return HttpResponse('You Are Not Allowed To Make This Action!!!!!')
     friend = friends.objects.filter(
             Q(user1  = request.user) | Q(user2 = request.user)
         )
@@ -577,7 +585,7 @@ def delete_member(request, user_id, group_id):
         return redirect('login')
     
     group = Groups.objects.get(id=group_id)
-    
+
     if group.created_by != request.user:
         return HttpResponse('You Are Not Allowed To Make This Action!!!!!')
     
