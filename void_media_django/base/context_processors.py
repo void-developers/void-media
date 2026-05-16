@@ -1,4 +1,4 @@
-from .models import notifications
+from .models import notifications, Group_chat
 from .models import messages as MessagesModel
 
 def notification_count(request):
@@ -18,7 +18,15 @@ def unread_count(request):
         msg_count = MessagesModel.objects.filter(
             receiver = request.user,
             is_read = False
-        ).count
+        ).count()
+        group_unread = Group_chat.objects.filter(
+            group__members=request.user
+            ).exclude(
+            reads__user=request.user
+            ).exclude(
+            sender=request.user
+            ).count()
+        total_unread = msg_count + group_unread
     else:
         msg_count = 0
-    return {'msg_count': msg_count}
+    return {'msg_count': total_unread}

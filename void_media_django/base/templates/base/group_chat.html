@@ -1,0 +1,87 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<a href="{% url 'group_info' group.id %}">
+    <h1>{{ group.name }}</h1>
+</a>
+
+<hr>
+
+<!-- CHAT BOX -->
+<div id="chat-box"
+     style="height:400px; overflow-y:auto; border:1px solid #000;
+            padding:10px; display:flex; flex-direction:column;">
+
+    {% for msg in group_messages %}
+
+        {% if msg.sender == request.user %}
+            <!-- RIGHT SIDE (YOU) -->
+            <div style="display:flex; justify-content:flex-end; margin:5px 0;">
+
+                <div style="max-width:60%;">
+
+                    <p style="margin:0; text-align:right;">You</p>
+
+                    <div style="border:1px solid #000; padding:8px;">
+                        <p style="margin:0; text-align:right;">
+                            {{ msg.message }}
+                        </p>
+                    </div>
+
+                    <small style="float:right;">
+                        {{ msg.created_at|timesince }} ago
+                    </small>
+
+                </div>
+
+            </div>
+
+        {% else %}
+            <!-- LEFT SIDE (OTHERS) -->
+            <div style="display:flex; justify-content:flex-start; margin:5px 0;">
+
+                <div style="max-width:60%;">
+
+                    <p style="margin:0;">
+                        {{ msg.sender.username }}
+                    </p>
+
+                    <div style="border:1px solid #000; padding:8px;">
+                        <p style="margin:0;">
+                            {{ msg.message }}
+                        </p>
+                    </div>
+
+                    <small>
+                        {{ msg.created_at|timesince }} ago
+                    </small>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+
+</div>
+
+<!-- INPUT -->
+<form method="POST" style="display:flex; margin-top:10px;">
+    {% csrf_token %}
+
+    <input type="text" name="message" placeholder="Message...."
+           style="flex:1; padding:10px;">
+
+    <button type="submit">Send</button>
+</form>
+
+<!-- AUTO SCROLL -->
+<script>
+    window.onload = function () {
+        let chatBox = document.getElementById("chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+{% endblock %}

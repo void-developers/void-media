@@ -1,0 +1,28 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<h1>Create a group</h1>
+
+<form method = 'POST'>
+    {% csrf_token %}
+    <label>Group name</label>
+    <input type="text" name="name" placeholder="group name">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <hr>
+    {% for f in friend %}
+    <label>
+    <input type="checkbox" name="members" value="{{f.id}}">
+    {{f.username}}
+    </label>
+    <hr>
+    {% endfor %}
+    <button type="submit">Create</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Your friends</h1>
+
+<form method="POST">
+    {% csrf_token %}
+{% for f in friend_list %}
+<label>
+    <input type="checkbox" name="members" value="{{f.id}}">
+    {{f.username}}
+</label>
+{% endfor %}
+
+ <button type="submit">Add</button>
+
+</form>
+{% endblock %}

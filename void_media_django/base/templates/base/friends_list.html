@@ -1,7 +1,21 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<a href="{% url 'create_group' %}"><button>Create a group</button></a>
 
+<h1>Groups</h1>
+    {% for g in groups %}
+        <b>{{g.name}}</b>
+        <a href="{% url 'group_chat' g.id %}"><button>Message</button></a>
+        {% if g.unread_count > 0 %}
+        <small>{{g.unread_count}} new messages</small>
+        {% endif %}
+        <hr>
+    {% endfor %}
+    
+    
+
+<h1>Friends</h1>
 {% for f in friend %}
     {% if f.user1 == request.user %}
         <a href="{% url 'profile' f.user2.id %}"><b>@{{f.user2.username}}</b></a>

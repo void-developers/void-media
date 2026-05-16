@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from .models import Posts, comments, likes, notifications , friend_requests, friends
+from .models import Posts, comments, likes, notifications , friend_requests, friends, Groups, Group_chat, Group_chat_isread
 from .models import messages as MassageModel
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login , logout
@@ -414,7 +414,21 @@ def friends_list(request):
             receiver=request.user,
             is_read=False
         ).count()
-    return render(request, 'base/friends_list.html', {'friend': friend})
+
+        groups = Groups.objects.filter(
+        members=request.user
+    )
+
+    for group in groups:
+
+        group.unread_count = Group_chat.objects.filter(
+            group=group
+        ).exclude(
+            reads__user=request.user
+        ).exclude(
+            sender=request.user
+        ).count()
+    return render(request, 'base/friends_list.html', {'friend': friend, 'groups':groups})
 
 def chat(request, user_id):
     if not request.user.is_authenticated:
@@ -446,3 +460,137 @@ def chat(request, user_id):
     return render(request,'base/chat.html', {'other_user':other_user, 'message':message})
 
 
+def create_group(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == 'POST':
+        try:
+            name = request.POST.get('name')
+            if name:
+
+                group = Groups.objects.create(
+                    name = name,
+                    created_by = request.user
+                )
+                group.members.add(request.user)
+                members = request.POST.getlist('members')
+        
+
+                for m in members:
+                    user = User.objects.get(id = m)
+                    group.members.add(user)
+
+                return redirect('group_chat', group.id)
+            else:
+                messages.error(request,'cant be empty')
+        except Exception as e:
+            return HttpResponse(str(e))
+    
+    friend = friends.objects.filter(
+            Q(user1  = request.user) | Q(user2 = request.user)
+        )
+    
+    friend_list = []
+
+    for f in friend:
+        if f.user1 == request.user:
+            friend_list.append(f.user2)
+        else:
+            friend_list.append(f.user1)
+    return render(request, 'base/group_form.html',{'friend':friend_list})
+
+def group_chat(request, group_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    group = Groups.objects.get(id=group_id)
+
+    group_messages = Group_chat.objects.filter(
+        group = group
+    )
+
+    for message in group_messages.exclude(sender=request.user):
+
+        Group_chat_isread.objects.get_or_create(
+            message=message,
+            user=request.user
+        )
+
+    if request.method =='POST':
+        message = request.POST.get('message')
+        if message:
+            try:
+                Group_chat.objects.create(
+                    group = group,
+                    sender = request.user,
+                    message = message
+                )
+                return redirect('group_chat', group.id)
+            except:
+                return HttpResponse('Something went wrong')
+        else:
+            messages.error(request,'cant be empty')
+            
+    return render(request, 'base/group_chat.html', {'group_messages':group_messages, 'group':group})
+
+
+
+def group_info(request, group_id):
+    group = Groups.objects.get(id=group_id)
+
+    group_members = group.members.all()
+
+    return render(request, 'base/group_info.html', {'group_members':group_members, 'group':group})
+
+    
+
+
+def add_member(request, group_id):
+    group = Groups.objects.get(id=group_id)
+
+    friend = friends.objects.filter(
+            Q(user1  = request.user) | Q(user2 = request.user)
+        )
+    
+    friend_list = []
+
+    for f in friend:
+        friend_list.append(f.user2 if f.user1 == request.user else f.user1)
+
+    available_friends = [u for u in friend_list if u not in group.members.all()]
+
+    if request.method == 'POST':
+        if group.created_by == request.user:
+            members = request.POST.getlist('members')
+        
+
+            for m in members:
+                user = User.objects.get(id = m)
+                group.members.add(user)
+            return redirect('group_info' , group.id)
+        else:
+            return HttpResponse('You Are Not Allowed To Make This Action!!!!!')
+    return render(request, 'base/add_member.html',{'friend_list':available_friends})
+
+def delete_member(request, user_id, group_id):
+    
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    group = Groups.objects.get(id=group_id)
+    
+    if group.created_by != request.user:
+        return HttpResponse('You Are Not Allowed To Make This Action!!!!!')
+    
+    if request.method == 'POST':
+        try:
+            user = User.objects.get(id=user_id)
+            group.members.remove(user)
+            return redirect('group_info' , group.id)
+        except:
+            return HttpResponse('Something went wrong!')
+        
+
+
+
+        
+        

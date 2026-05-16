@@ -91,3 +91,33 @@ class messages(models.Model):
 
     def __str__(self):
         return f'{self.sender} - {self.receiver} - {self.created_at}'
+    
+
+class Groups(models.Model):
+    name = models.CharField(max_length=100)
+    members = models.ManyToManyField(User, related_name='chat_group')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.name}'
+    
+class Group_chat(models.Model):
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='group_messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.sender} -> {self.message}'
+    
+
+class Group_chat_isread(models.Model):
+    message = models.ForeignKey(Group_chat, on_delete=models.CASCADE, related_name='reads')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.message} - {self.user}'

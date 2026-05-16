@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>{{group.name}}</h1>
+{% if group.created_by == request.user %}
+<a href="{% url 'add_member' group.id %}"><button>Add Member</button></a>
+{% endif %}
+<h2>Members</h2>
+{% for m in group_members %}
+<a href="{% url 'profile' m.id%}"><p>@{{m.username}}</p></a>
+{% if group.created_by == request.user %}
+<form  method="POST" action="{% url 'delete_member' m.id group.id %}">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+</form>
+{% endif %}
+<hr>
+{% endfor %}
+
+{% endblock %}
