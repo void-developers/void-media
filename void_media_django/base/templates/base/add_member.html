@@ -11,9 +11,12 @@
     <input type="checkbox" name="members" value="{{f.id}}">
     {{f.username}}
 </label>
+<hr>
 {% endfor %}
 
  <button type="submit">Add</button>
 
 </form>
+<a href="{% url 'group_chat' group.id %}"><h3>Return</h3></a>
+
 {% endblock %}

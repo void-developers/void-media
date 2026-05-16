@@ -3,6 +3,7 @@
 {% block content %}
 
 <h1>{{group.name}}</h1>
+<a href="{% url 'group_chat' group.id %}"><h3>Return</h3></a>
 {% if group.created_by == request.user %}
 <a href="{% url 'add_member' group.id %}"><button>Add Member</button></a>
 {% endif %}
