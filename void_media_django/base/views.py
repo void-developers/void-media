@@ -577,7 +577,7 @@ def add_member(request, group_id):
             return redirect('group_info' , group.id)
         else:
             return HttpResponse('You Are Not Allowed To Make This Action!!!!!')
-    return render(request, 'base/add_member.html',{'friend_list':available_friends})
+    return render(request, 'base/add_member.html',{'friend_list':available_friends, 'group':group})
 
 def delete_member(request, user_id, group_id):
     
