@@ -14,6 +14,8 @@ def notification_count(request):
     return {'new_notification': count}
 
 def unread_count(request):
+    total_unread = 0
+    
     if request.user.is_authenticated:
         msg_count = MessagesModel.objects.filter(
             receiver = request.user,
