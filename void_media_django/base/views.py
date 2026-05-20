@@ -10,6 +10,8 @@ from django.http import HttpResponse
 import re
 from django.db.models import Q
 
+# Create your views here.
+
 def handle_mentions(content, sender , post=None, comment=None):
     mentions = re.findall(r'@(\w+)', content )
 
@@ -44,7 +46,6 @@ def handle_mentions(content, sender , post=None, comment=None):
             )
     return content
 
-# Create your views here.
 def home(request):
     post = Posts.objects.all()
     comment_counter = comments.post
@@ -172,7 +173,6 @@ def Register(request):
             return redirect('home')
     return render(request , 'base/sign_log.html', {'page': page, 'form': form})
     
-    
 def comment(request ,pk):
     post = Posts.objects.get(id=pk)
     
@@ -276,7 +276,6 @@ def likedusers(request, pk):
         messages.error(request, 'Invalid type specified.')
         return redirect('home')
 
-
 def edit_post(request, pk):
     post = Posts.objects.get(id=pk)
     if request.user != post.username:
@@ -331,7 +330,6 @@ def delete_notification(request , pk):
         notification.delete()
     return redirect('notifications')
 
-
 def friend_request(request, pk):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -353,7 +351,6 @@ def friend_request(request, pk):
         except:
             return HttpResponse('Something Went Wrong!!')
     return render(request,'base/profile.html', {'receiver':receiver})
-
 
 def accept_request(request,pk):
     the_request = friend_requests.objects.get(id=pk)
@@ -392,8 +389,6 @@ def unfreind(request,user_id):
             return redirect('profile' ,pk = profile_user.id)
         except:
             return HttpResponse('unexpected error')
-
-    
 
 def friends_list(request):
     if not request.user.is_authenticated:
@@ -458,7 +453,6 @@ def chat(request, user_id):
         else:
             message.error('can not be empty')
     return render(request,'base/chat.html', {'other_user':other_user, 'message':message})
-
 
 def create_group(request):
     if not request.user.is_authenticated:
@@ -535,8 +529,6 @@ def group_chat(request, group_id):
             
     return render(request, 'base/group_chat.html', {'group_messages':group_messages, 'group':group})
 
-
-
 def group_info(request, group_id):
     group = Groups.objects.get(id=group_id)
 
@@ -546,9 +538,6 @@ def group_info(request, group_id):
     group_members = group.members.all()
 
     return render(request, 'base/group_info.html', {'group_members':group_members, 'group':group})
-
-    
-
 
 def add_member(request, group_id):
     group = Groups.objects.get(id=group_id)
@@ -596,9 +585,5 @@ def delete_member(request, user_id, group_id):
             return redirect('group_info' , group.id)
         except:
             return HttpResponse('Something went wrong!')
-        
 
 
-
-        
-        
