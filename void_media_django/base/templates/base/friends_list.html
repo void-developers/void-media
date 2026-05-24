@@ -8,7 +8,7 @@
         <a href="{% url 'group_info' g.id %}">
             {% load cloudinary %}
 
-            {% cloudinary g.gpfp.url quality='auto' width=100 height=100 crop='fill' %}
+            {% cloudinary g.gpfp. quality='auto' width=100 height=100 crop='fill' %}
             <b>{{g.name}}</b></a>
         <a href="{% url 'group_chat' g.id %}"><button>Message</button></a>
         {% if g.unread_count > 0 %}
