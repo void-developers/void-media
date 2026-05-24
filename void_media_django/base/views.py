@@ -197,21 +197,18 @@ def Login(request):
 
     if request.user.is_authenticated:
         return redirect('home')
-    
+
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        try:
-            user = User.objects.get(username=email)
-        except User.DoesNotExist:
-            messages.error(request, 'User does not exist.')
         user = authenticate(request, username=email, password=password)
+
         if user is not None:
             login(request, user)
             return redirect('home')
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, 'Invalid email or password.')
 
     return render(request, 'base/sign_log.html', {'page': page})
 
