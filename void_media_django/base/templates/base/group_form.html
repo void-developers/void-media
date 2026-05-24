@@ -3,10 +3,14 @@
 
 <h1>Create a group</h1>
 
-<form method = 'POST'>
+<form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <label>Group name</label>
     <input type="text" name="name" placeholder="group name">
+    <p>
+        <label>Group picture</label>
+        <input type="file" name="gpfp" accept="image/*">
+    </p>
     {% if messages %}
     <ul class="messages">
         {% for message in messages %}

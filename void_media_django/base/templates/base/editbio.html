@@ -1,0 +1,15 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Change Your Bio</h1>
+
+<form method="POST" action="">
+    {% csrf_token %}
+    <input type="text" name="bio" placeholder="change your bio">
+    <button type="submit">Update</button>
+</form>
+
+<a href="{{request.META.HTTP_REFERER}}">Return</a>
+
+{% endblock %}

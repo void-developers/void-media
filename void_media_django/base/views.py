@@ -1,16 +1,24 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from .models import Posts, comments, likes, notifications , friend_requests, friends, Groups, Group_chat, Group_chat_isread
+from .models import Posts, comments, likes, notifications , friend_requests, friends, Groups, Group_chat, Group_chat_isread,User, DEFAULT_PFP
 from .models import messages as MassageModel
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login , logout
-from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 import re
 from django.db.models import Q
 
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
+import cloudinary.uploader
+
 # Create your views here.
+
+ALLOWED_EXTENSIONS = {"png","jpg","jpeg","gif", "webp"}
+ALLOWED_VIDEO_EXTENSIONS = {"mp4", "mov", "webm", "avi", "mkv"}
+
+
 
 def handle_mentions(content, sender , post=None, comment=None):
     mentions = re.findall(r'@(\w+)', content )
@@ -62,9 +70,24 @@ def home(request):
     if request.POST:
         if user.is_authenticated:
             content = request.POST.get('content')
+            file = request.FILES.get('file')
+
+            
             
             if content:
                 post = Posts.objects.create(username=request.user, content=content)
+                if file:
+                    extention = file.name.rsplit('.',1)[-1].lower()
+                    if extention in  ALLOWED_EXTENSIONS:
+                        post.image = file
+                    elif extention in ALLOWED_VIDEO_EXTENSIONS:
+                        post.video = file
+                    else:
+                        messages.error(request,'invalid file type')
+                        post.delete()
+                        return redirect('home')
+
+
                 post.content = handle_mentions(
                     content=content,
                     sender = request.user,
@@ -105,27 +128,69 @@ def profile(request,pk):
             comment.is_liked = comment.likes.filter(username=current_user).exists()
         else:
             comment.is_liked = False
+    if request.user.is_authenticated:
+        incomming_request = friend_requests.objects.filter(
+            sender = profile_user,
+            receiver = request.user
+        ).first()
 
-    incomming_request = friend_requests.objects.filter(
-        sender = profile_user,
-        receiver = request.user
-    ).first()
-
-    outgoing_request = friend_requests.objects.filter(
-        sender = request.user,
-        receiver = profile_user
-    ).first()
+        outgoing_request = friend_requests.objects.filter(
+            sender = request.user,
+            receiver = profile_user
+        ).first()
 
 
-    is_friend = friends.objects.filter(
-        user1=request.user,
-        user2=profile_user
-    ).exists() or friends.objects.filter(
-        user1=profile_user,
-        user2=request.user
-    ).exists()
+        is_friend = friends.objects.filter(
+            user1=request.user,
+            user2=profile_user
+        ).exists() or friends.objects.filter(
+            user1=profile_user,
+            user2=request.user
+        ).exists()
+    else:
+        incomming_request = None
+        outgoing_request = None
+        is_friend = None
     
     return render(request, 'base/profile.html', {'profile_user': profile_user, 'posts': post, 'liked_posts': liked_posts, 'comments': liked_comments, 'incomming_request':incomming_request, 'outgoing_request': outgoing_request ,'is_friend':is_friend})
+
+def editpfp(request, user_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    user = User.objects.get(id=user_id)
+    if request.user != user:
+        return HttpResponse('You are not allowed to make this action!!')
+    if request.method == 'POST':
+        filename = request.FILES.get('filename')
+        if filename:
+            extention = filename.name.rsplit('.',1)[-1].lower()
+            if extention in ALLOWED_EXTENSIONS:
+                old_pfp = user.pfp
+                user.pfp = filename
+                user.save()
+                old_public_id = getattr(old_pfp, 'public_id', None)
+                if old_public_id and str(old_pfp) != DEFAULT_PFP:
+                    cloudinary.uploader.destroy(old_public_id)
+                return redirect('profile', user.id)
+            else:
+                messages.error(request,'invalid file type.')
+        else:
+            messages.error(request,'can not be empty.')
+    return render(request,'base/editpfp.html',{'user':user})
+
+def editbio(request,user_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    user = User.objects.get(id=user_id)
+    if request.user != user:
+        return HttpResponse('You Are Not Allowed To Make This Action!!!')
+    if request.method == 'POST':
+        bio = request.POST.get('bio')
+        if bio:
+            user.bio = bio
+            user.save()
+            return redirect('profile', user.id)
+    return render(request, 'base/editbio.html', {'user':user})
 
 def Login(request):
     page = 'login'
@@ -134,14 +199,14 @@ def Login(request):
         return redirect('home')
     
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
 
         try:
-            user = User.objects.get(username=username)
+            user = User.objects.get(username=email)
         except User.DoesNotExist:
             messages.error(request, 'User does not exist.')
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
             return redirect('home')
@@ -156,22 +221,62 @@ def Logout(request):
 
 def Register(request):
     page = 'register'
-    form = UserCreationForm()
     if request.user.is_authenticated:
         return redirect('home')
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        has_error = False
+        username = request.POST.get('username')
+        if not username:
+            messages.error(request, 'Username is required.')
+            has_error = True
+        elif len(username) < 3:
+            messages.error(request, 'Username must be at least 3 characters.')
+            has_error = True
+        elif len(username) > 30:
+            messages.error(request, 'Username must be 30 characters or less.')
+            has_error = True
+        elif not re.match(r'^[a-zA-Z0-9_]+$', username):
+            messages.error(request, 'Username can only contain letters, numbers, and underscores.')
+            has_error = True
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+            has_error = True
 
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.username = user.username.lower()
-            user.save()
-            login(request, user)
-            return redirect('home')
+
+        email = request.POST.get('email')
+        if not email:
+            messages.error(request, 'Email is required.')
+            has_error = True
+        elif User.objects.filter(email=email).exists():
+            messages.error(request, 'Email already exists.')
+            has_error = True
+
+
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
         else:
-            messages.error(request, 'An error occurred during registration')
-            return redirect('home')
-    return render(request , 'base/sign_log.html', {'page': page, 'form': form})
+            try:
+                validate_password(password)
+            except ValidationError as errors:
+                 for error in errors:
+                    messages.error(request, error)
+                    has_error = True
+
+        if has_error:
+            return redirect('register')
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        login(request, user)
+        return redirect('home')
+    
+    return render(request , 'base/sign_log.html', {'page': page})
     
 def comment(request ,pk):
     post = Posts.objects.get(id=pk)
@@ -410,8 +515,8 @@ def friends_list(request):
             is_read=False
         ).count()
 
-        groups = Groups.objects.filter(
-        members=request.user
+    groups = Groups.objects.filter(
+    members=request.user
     )
 
     for group in groups:
@@ -442,16 +547,33 @@ def chat(request, user_id):
 
     if request.method == 'POST':
         content = request.POST.get('content')
+        file = request.FILES.get('file')
+        
+
+
         if content:
-            MassageModel.objects.create(
+            msg = MassageModel.objects.create(
                 sender = request.user,
                 receiver = other_user,
                 content = content,
             )
+
+            if file:
+                extention = file.name.rsplit('.',1)[-1].lower()
+                if extention in  ALLOWED_EXTENSIONS:
+                    msg.image = file
+                elif extention in ALLOWED_VIDEO_EXTENSIONS:
+                    msg.video = file
+                else:
+                    messages.error(request,'invalid file type')
+                    msg.delete()
+                    return redirect('chat' ,user_id=user_id)
+
+            msg.save()
             
             return redirect('chat' ,user_id=user_id)
         else:
-            message.error('can not be empty')
+            messages.error(request, 'can not be empty')
     return render(request,'base/chat.html', {'other_user':other_user, 'message':message})
 
 def create_group(request):
@@ -460,12 +582,22 @@ def create_group(request):
     if request.method == 'POST':
         try:
             name = request.POST.get('name')
+            gpfp = request.FILES.get('gpfp')
             if name:
 
                 group = Groups.objects.create(
                     name = name,
                     created_by = request.user
                 )
+                if gpfp:
+                    extention = gpfp.name.rsplit('.',1)[-1].lower()
+                    if extention in ALLOWED_EXTENSIONS:
+                        group.gpfp = gpfp
+                        group.save()
+                    else:
+                        group.delete()
+                        messages.error(request,'invalid file type')
+                        return redirect('create_group')
                 group.members.add(request.user)
                 members = request.POST.getlist('members')
         
@@ -514,13 +646,27 @@ def group_chat(request, group_id):
 
     if request.method =='POST':
         message = request.POST.get('message')
+        file = request.FILES.get('file')
         if message:
             try:
-                Group_chat.objects.create(
+                msg = Group_chat.objects.create(
                     group = group,
                     sender = request.user,
                     message = message
                 )
+                if file:
+                    extention = file.name.rsplit('.',1)[-1].lower()
+                    if extention in  ALLOWED_EXTENSIONS:
+                        msg.image = file
+                    elif extention in ALLOWED_VIDEO_EXTENSIONS:
+                        msg.video = file
+                    else:
+                        messages.error(request,'invalid file type')
+                        msg.delete()
+                        return redirect('group_chat', group_id)
+
+                msg.save()
+
                 return redirect('group_chat', group.id)
             except:
                 return HttpResponse('Something went wrong')
@@ -586,4 +732,40 @@ def delete_member(request, user_id, group_id):
         except:
             return HttpResponse('Something went wrong!')
 
+def editgpfp(request, group_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    group = Groups.objects.get(id=group_id)
+    if not group.members.filter(id=request.user.id).exists():
+        return HttpResponse('You are not allowed to make this action!!')
+    if request.method == 'POST':
+        filename = request.FILES.get('filename')
+        if filename:
+            extention = filename.name.rsplit('.',1)[-1].lower()
+            if extention in ALLOWED_EXTENSIONS:
+                old_gpfp = group.gpfp
+                group.gpfp = filename
+                group.save()
+                old_public_id = getattr(old_gpfp, 'public_id', None)
+                if old_public_id and str(old_gpfp) != DEFAULT_PFP:
+                    cloudinary.uploader.destroy(old_public_id)
+                return redirect('group_info', group.id)
+            else:
+                messages.error(request,'invalid file type.')
+        else:
+            messages.error(request,'can not be empty.')
+    return render(request,'base/editpfp.html',{'group':group})
 
+def editgbio(request,group_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    group = Groups.objects.get(id=group_id)
+    if not group.members.filter(id=request.user.id).exists():
+        return HttpResponse('You Are Not Allowed To Make This Action!!!')
+    if request.method == 'POST':
+        bio = request.POST.get('bio')
+        if bio:
+            group.bio = bio
+            group.save()
+            return redirect('group_info', group.id)
+    return render(request, 'base/editbio.html', {'group':group})

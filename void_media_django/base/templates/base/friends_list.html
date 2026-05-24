@@ -1,10 +1,15 @@
 {% extends 'main.html' %}
 
 {% block content %}
+
 <a href="{% url 'create_group' %}"><button>Create a group</button></a>
 <h1>Groups</h1>
     {% for g in groups %}
-        <a href="{% url 'group_info' g.id %}"><b>{{g.name}}</b></a>
+        <a href="{% url 'group_info' g.id %}">
+            {% load cloudinary %}
+
+            {% cloudinary g.gpfp.url quality='auto' width=100 height=100 crop='fill' %}
+            <b>{{g.name}}</b></a>
         <a href="{% url 'group_chat' g.id %}"><button>Message</button></a>
         {% if g.unread_count > 0 %}
         <small>{{g.unread_count}} new messages</small>
@@ -16,12 +21,19 @@
 <h1>Friends</h1>
 {% for f in friend %}
     {% if f.user1 == request.user %}
-        <a href="{% url 'profile' f.user2.id %}"><b>@{{f.user2.username}}</b></a>
+        <a href="{% url 'profile' f.user2.id %}">
+        {% load cloudinary %}
+
+        {% cloudinary f.user2.pfp quality='auto' width=100 height=100 crop='fill' %}
+        <b>@{{f.user2.username}}</b></a>
         <a href="{% url 'chat' f.user2.id %}"><button>Message</button></a>
             {% if f.unread_count > 0 %}
                 <small>{{f.unread_count}} new messages</small>
             {% endif %}
     {% else %}
+        {% load cloudinary %}
+
+        {% cloudinary f.user1.pfp quality='auto' width=100 height=100 crop='fill' %}
         <a href="{% url 'profile' f.user1.id%}"><b>@{{f.user1.username}}</b></a>
             <a href="{% url 'chat' f.user1.id %}"><button>Message</button></a>
             {% if f.unread_count > 0 %}
@@ -30,5 +42,6 @@
     {% endif %}
     <hr>
 {% endfor %}
+
 {% endblock %}
 med

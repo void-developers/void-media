@@ -1,4 +1,7 @@
 {% for comment in comments %}
+    {% load cloudinary %}
+
+    {% cloudinary comment.username.pfp quality='auto' width=100 height=100 crop='fill' %}
     <a href="{% url 'profile' comment.username.id %}">@{{ comment.username }}</a> - {{comment.created_at|timesince}}
     <p>{{ comment.content|safe }}</p> <!-- |safe can receive attacks if someone wrote a code -->
 

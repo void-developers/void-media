@@ -9,8 +9,16 @@
     gap: 50px;
 }
 </style>
-
+{% load cloudinary %}
+<a href="{% url 'editpfp' request.user.id%}">
+{% cloudinary profile_user.pfp quality='auto' width=100 height=100 crop='fill' %}
+</a>
 <h1>{{ profile_user.username }}</h1>
+    <h2>bio</h2>
+    <b>{{profile_user.bio}}</b>
+    {% if request.user == profile_user %}
+        <a href="{% url 'editbio' request.user.id %}">🖊️</a>
+    {% endif %}
 
 {% if request.user != profile_user %}
     {% if is_friend %}

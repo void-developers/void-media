@@ -2,13 +2,26 @@
 
 {% block content %}
 
+
+<a href="{% url 'editgpfp' group.id %}">
+{% load cloudinary %}
+
+{% cloudinary group.gpfp quality='auto' width=100 height=100 crop='fill' %}
+</a>
+
 <h1>{{group.name}}</h1>
 <a href="{% url 'group_chat' group.id %}"><h3>Return</h3></a>
 {% if group.created_by == request.user %}
 <a href="{% url 'add_member' group.id %}"><button>Add Member</button></a>
 {% endif %}
+<h2>bio</h2>
+<b>{{group.bio}}</b>
+<a href="{% url 'editgbio' group.id %}">🖊️</a>
 <h2>Members</h2>
 {% for m in group_members %}
+{% load cloudinary %}
+
+{% cloudinary m.pfp quality='auto' width=100 height=100 crop='fill' %}
 <a href="{% url 'profile' m.id%}"><p>@{{m.username}}</p></a>
 {% if group.created_by == request.user %}
 <form  method="POST" action="{% url 'delete_member' m.id group.id %}">

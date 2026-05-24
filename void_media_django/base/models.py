@@ -1,12 +1,27 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+from cloudinary.models import CloudinaryField
 
 # Create your models here.
 
+DEFAULT_PFP = 'https://res.cloudinary.com/do8c7jwpb/image/upload/v1779531900/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158_vt4mtz.webp'
+
+class User(AbstractUser):
+    email = models.EmailField(unique=True)
+    bio = models.TextField(null=True)
+    pfp = CloudinaryField('image', default = DEFAULT_PFP)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return f'{self.username}'
 
 class Posts(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
+    image = CloudinaryField('image', null=True, blank=True)
+    video = CloudinaryField('video', resource_type='video', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     edited = models.BooleanField(default=False)
 
@@ -83,6 +98,8 @@ class messages(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
     content = models.TextField()
+    image = CloudinaryField('image', null=True, blank=True)
+    video = CloudinaryField('video', resource_type='video', null=True, blank=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -95,6 +112,8 @@ class messages(models.Model):
 
 class Groups(models.Model):
     name = models.CharField(max_length=100)
+    gpfp = CloudinaryField('image', default = DEFAULT_PFP)
+    bio = models.TextField(null=True)
     members = models.ManyToManyField(User, related_name='chat_group')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -106,6 +125,8 @@ class Group_chat(models.Model):
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='group_messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
+    image = CloudinaryField('image', null=True, blank=True)
+    video = CloudinaryField('video', resource_type='video', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

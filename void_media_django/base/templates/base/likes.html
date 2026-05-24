@@ -4,7 +4,11 @@
 
 <h1>Liked users</h1>
 {% for users in liked_users %}
-    <a href="{% url 'profile' user.id %}"><p>@{{ users }}</p></a>
+<a href="{% url 'profile' user.id %}">
+    {% load cloudinary %}
+
+    {% cloudinary user.pfp quality='auto' width=100 height=100 crop='fill' %}
+    <p>@{{ users }}</p></a>
     <hr>
 {% endfor %}
 

@@ -1,12 +1,37 @@
 
-
         {% for post in posts %}
-        <div id="post-{{post.id}}">
+        <div>
+            
             {% if post.edited %}
             <small>Edited</small>
             {% endif %}
-            <a href="{% url 'profile' post.username.id %}"><p>@{{ post.username }}</a> - {{post.created_at|timesince}} ago</p>
+            <a href="{% url 'profile' post.username.id %}">
+                {% load cloudinary %}
+
+                {% cloudinary post.username.pfp quality='auto' width=100 height=100 crop='fill' %}
+            
+                <p>@{{ post.username }}</a> - {{post.created_at|timesince}} ago</p>
             <p>{{ post.content|safe }}</p> <!-- |safe can receive attacks if someone wrote a code -->
+            {% if post.image %}
+            <p>
+                <p><img src="{{post.image.url}}" alt="" width="70" height="70"></p>
+            </p>
+            {% endif %}
+            {% if post.video %}
+            <p>
+                {% cloudinary_url post.video resource_type='video' width=360 crop='limit' quality='auto' video_codec='auto' format='mp4' as video_360 %}
+                {% cloudinary_url post.video resource_type='video' width=720 crop='limit' quality='auto' video_codec='auto' format='mp4' as video_720 %}
+                <video id="post-video-{{ post.id }}" controls width="400" preload="none">
+                    <source src="{{ video_360 }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <br>
+                <select onchange="changeVideoQuality(this, 'post-video-{{ post.id }}')">
+                    <option value="{{ video_360 }}">360p</option>
+                    <option value="{{ video_720 }}">720p</option>
+                </select>
+            </p>
+            {% endif %}
             <a href="{% url 'comment' post.id %}"><button>Comments({{post.comments.count}})</button></a>
         </div>
             <form method="POST" action="{% url 'like' post.id  %}">
@@ -26,3 +51,17 @@
             <hr>
         {% endfor %}
 
+<script>
+function changeVideoQuality(select, videoId) {
+    const video = document.getElementById(videoId);
+    const currentTime = video.currentTime;
+    const wasPlaying = !video.paused;
+
+    video.src = select.value;
+    video.currentTime = currentTime;
+
+    if (wasPlaying) {
+        video.play();
+    }
+}
+</script>

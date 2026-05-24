@@ -13,8 +13,8 @@
 {% if page == 'login' %}
 <form method="POST">
     {% csrf_token %}
-    <label>Username</label>
-    <input type="text" name="username" placeholder="Enter Your Username"/>
+    <label>Email</label>
+    <input type="text" name="email" placeholder="Enter Your email"/>
     <label>Password</label>
     <input type="password" name="password" placeholder="Enter Your Password"/>
     <button type="submit">Login</button>
@@ -27,9 +27,25 @@
 
  <form method="POST" action="">
         {% csrf_token %}
+        <p>Username</p>
+        <input type="text" name="username" placeholder="Username">
+        <p>Username must be 3-30 characters long.</p>
+        <p>Username can only contain letters, numbers, and underscores.</p>
+        <hr>
+        <p>Email</p>
+        <input type="email" name="email" placeholder="Email">
+        <hr>
+        <p>Password</p>
+        <input type="password" name="password" placeholder="Password">
+        <p>Password must not be too similar to your personal information.</p>
+        <p>Password must contain at least 8 characters.</p>
+        <p>Password must not be a commonly used password.</p>
+        <p>Password must not be entirely numeric.</p>
+        <hr>
+        <p>Confirm Password</p>
+        <input type="password" name="confirm_password" placeholder="write your password again">
 
-        {{form.as_p}}
-        
+        <hr>
         <button type="submit">Register</button>
         <p>already have an account?</p>
         <a href="{% url 'login' %}">Login here</a>

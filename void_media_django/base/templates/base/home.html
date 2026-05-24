@@ -4,19 +4,32 @@
 {% if q %}
     <h1>searched resault for {{q}}</h1>
     {% for user in users %}
-    <a href="{% url 'profile' user.id%}"><p>@{{user.username}}</p></a>
+    
+    <a href="{% url 'profile' user.id%}">
+        {% load cloudinary %}
+
+        {% cloudinary post.username.pfp quality='auto' width=100 height=100 crop='fill' %}
+        <p>@{{user.username}}</p></a>
     <hr>
     {% empty %}
     <h2>No Users Found</h2>
     {% endfor %}
 
     {% else %}
+    {% if request.user.is_authenticated %}
+
+    {% load cloudinary %}
+
+    {% cloudinary user.pfp.url quality='auto' width=100 height=100 crop='fill' %}
+    
+    {% endif %}
     <h1>Welcome {{ user.username }}</h1>
     {% if request.user.is_authenticated %}
     <hr>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="text" name="content" id="content" cols="30" rows="10" placeholder="What Are You Thinking"></input>
+        <p><input type="file" name="file" accept="image/*,video/*"></p>
         <button type="submit">Post</button>
     </form>
     {% endif %}

@@ -2,22 +2,207 @@
 
 {% block content %}
 
-<h1>chat with {{ other_user }}</h1>
+<style>
+.chat-page {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.chat-header a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.chat-header img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+}
+
+.chat-header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.chat-box {
+    width: 100%;
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #000;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+.message-row {
+    display: flex;
+}
+
+.message-row.mine {
+    justify-content: flex-end;
+}
+
+.message-row.theirs {
+    justify-content: flex-start;
+}
+
+.message-card {
+    max-width: 65%;
+}
+
+.message-name {
+    margin: 0 0 4px;
+    font-size: 13px;
+}
+
+.mine .message-name,
+.mine small {
+    text-align: right;
+    display: block;
+}
+
+.message-bubble {
+    border: 1px solid #000;
+    padding: 8px 10px;
+    word-wrap: break-word;
+}
+
+.message-bubble p {
+    margin: 0;
+}
+
+.message-video {
+    display: block;
+    max-width: 240px;
+    max-height: 240px;
+    margin-bottom: 8px;
+}
+
+.video-quality {
+    display: block;
+    margin: 4px 0 8px;
+}
+
+.chat-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.chat-form input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+}
+
+.chat-form input[type="file"] {
+    max-width: 180px;
+}
+
+.chat-form button {
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.messages {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+.messages li {
+    border: 1px solid #d66;
+    color: #9b1c1c;
+    background: #ffecec;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+}
+
+@media (max-width: 600px) {
+    .chat-page {
+        padding: 0 12px;
+    }
+
+    .chat-form {
+        flex-wrap: wrap;
+    }
+
+    .chat-form input[type="text"] {
+        flex-basis: 100%;
+    }
+
+    .chat-form input[type="file"] {
+        max-width: 100%;
+    }
+
+    .message-card {
+        max-width: 85%;
+    }
+}
+</style>
+
+<div class="chat-page">
+<div class="chat-header">
+
+<a href="{% url 'profile' other_user.id %}">
+{% load cloudinary %}
+
+{% cloudinary other_user.pfp quality='auto' width=64 height=64 crop='fill' %}
+<h1>{{ other_user }}</h1>
+</a>
+</div>
 <hr>
 
 <!-- CHAT BOX -->
-<div id = "chat-box" style="height:400px; overflow-y:auto; border:1px solid #000; padding:10px; display:flex; flex-direction:column;">
+<div id="chat-box" class="chat-box">
 
     {% for msg in message %}
 
         {% if msg.sender == request.user %}
-            <div style="display:flex; justify-content:flex-end; margin:5px 0;">
+            <div class="message-row mine">
 
-                <div style="max-width:60%;">
-                    <p style="margin:0; text-align:right;">You</p>
+                <div class="message-card">
+                    <p class="message-name">You</p>
 
-                    <div style="border:1px solid #000; padding:8px;">
-                        <p style="margin:0; text-align:right;">{{ msg.content }}</p>
+                    <div class="message-bubble">
+                        {% if msg.image %}
+
+                            {% load cloudinary %}
+
+                            {% cloudinary msg.image.url quality='auto' width=100 height=100 crop='fill' %}
+
+                        {% endif %}
+
+                        {% if msg.video %}
+                            {% cloudinary_url msg.video resource_type='video' width=240 crop='limit' quality='auto' video_codec='auto' format='mp4' as video_240 %}
+                            {% cloudinary_url msg.video resource_type='video' width=480 crop='limit' quality='auto' video_codec='auto' format='mp4' as video_480 %}
+                            <video id="chat-video-{{ msg.id }}" controls preload="none" class="message-video">
+                                <source src="{{ video_240 }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <select class="video-quality" onchange="changeVideoQuality(this, 'chat-video-{{ msg.id }}')">
+                                <option value="{{ video_240 }}">240p</option>
+                                <option value="{{ video_480 }}">480p</option>
+                            </select>
+                        {% endif %}
+                        <p>{{ msg.content }}</p>
                     </div>
                     <small>{{msg.created_at|timesince}} ago</small>
                 </div>
@@ -25,13 +210,32 @@
             </div>
 
         {% else %}
-            <div style="display:flex; justify-content:flex-start; margin:5px 0;">
+            <div class="message-row theirs">
 
-                <div style="max-width:60%;">
-                    <p style="margin:0;">{{ msg.sender.username }}</p>
+                <div class="message-card">
+                    <p class="message-name">{{ msg.sender.username }}</p>
 
-                    <div style="border:1px solid #000; padding:8px;">
-                        <p style="margin:0;">{{ msg.content }}</p>
+                    <div class="message-bubble">
+                        {% if msg.image %}
+
+                            {% load cloudinary %}
+
+                            {% cloudinary msg.image.url quality='auto' width=100 height=100 crop='fill' %}
+
+                        {% endif %}
+                        {% if msg.video %}
+                            {% cloudinary_url msg.video resource_type='video' width=240 crop='limit' quality='auto' video_codec='auto' format='mp4' as video_240 %}
+                            {% cloudinary_url msg.video resource_type='video' width=480 crop='limit' quality='auto' video_codec='auto' format='mp4' as video_480 %}
+                            <video id="chat-video-{{ msg.id }}" controls preload="none" class="message-video">
+                                <source src="{{ video_240 }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <select class="video-quality" onchange="changeVideoQuality(this, 'chat-video-{{ msg.id }}')">
+                                <option value="{{ video_240 }}">240p</option>
+                                <option value="{{ video_480 }}">480p</option>
+                            </select>
+                        {% endif %}
+                        <p>{{ msg.content }}</p>
                     </div>
                     <small>{{msg.created_at|timesince}} ago</small>
                 </div>
@@ -45,17 +249,39 @@
 </div>
 
 <!-- INPUT -->
-<form method="POST" style="display:flex; margin-top:10px;">
+<form method="POST" enctype="multipart/form-data" class="chat-form">
     {% csrf_token %}
-    <input type="text" name="content" placeholder="Message...."
-           style="flex:1; padding:10px;">
+    <input type="text" name="content" placeholder="Message....">
+    <input type="file" name="file" accept="image/*,video/*">
     <button type="submit">Send</button>
 </form>
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</div>
 
 <script>
     window.onload = function () {
         let chatBox = document.getElementById("chat-box");
         chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function changeVideoQuality(select, videoId) {
+        const video = document.getElementById(videoId);
+        const currentTime = video.currentTime;
+        const wasPlaying = !video.paused;
+
+        video.src = select.value;
+        video.currentTime = currentTime;
+
+        if (wasPlaying) {
+            video.play();
+        }
     }
 </script>
 {% endblock %}
