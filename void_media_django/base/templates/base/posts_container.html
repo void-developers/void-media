@@ -14,8 +14,10 @@
             <p>{{ post.content|safe }}</p> <!-- |safe can receive attacks if someone wrote a code -->
             {% if post.image %}
             <p>
-                <p><img src="{{post.image.url}}" alt="" width="70" height="70"></p>
-            </p>
+                {% load cloudinary %}
+
+
+                {% cloudinary post.image quality='auto' width=70 height=70 crop='fill' %}            </p>
             {% endif %}
             {% if post.video %}
             <p>
