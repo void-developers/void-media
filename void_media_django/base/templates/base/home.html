@@ -8,7 +8,7 @@
     <a href="{% url 'profile' user.id%}">
         {% load cloudinary %}
 
-        {% cloudinary post.username.pfp quality='auto' width=100 height=100 crop='fill' %}
+        {% cloudinary user.pfp.url quality='auto' width=100 height=100 crop='fill' %}
         <p>@{{user.username}}</p></a>
     <hr>
     {% empty %}
