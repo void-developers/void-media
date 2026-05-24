@@ -8,6 +8,7 @@ cffi==2.0.0
 charset-normalizer==3.4.3
 click==8.3.0
 cloudinary==1.44.1
+django-cloudinary-storage==0.3.0
 colorama==0.4.6
 cryptography==46.0.7
 distlib==0.4.0
