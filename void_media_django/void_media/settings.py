@@ -155,4 +155,9 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Where Django will collect files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+
 CORS_ALLOWED_ORIGINS = []
